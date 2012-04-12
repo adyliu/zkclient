@@ -95,10 +95,10 @@ public class TestUtil {
     }
 
     public static ZkServer startZkServer(String testName, int port) throws IOException {
-        String dataPath = "./build/test/" + testName + "/data";
-        String logPath = "./build/test/" + testName + "/log";
-        FileUtils.deleteDirectory(new File(dataPath));
-        FileUtils.deleteDirectory(new File(logPath));
+        String dataPath = "build/test/" + testName + "/data";
+        String logPath = "build/test/" + testName + "/log";
+        FileUtils.deleteDirectory(new File(".",dataPath).getCanonicalFile());
+        FileUtils.deleteDirectory(new File(".",logPath).getCanonicalFile());
         ZkServer zkServer = new ZkServer(dataPath, logPath, mock(IDefaultNameSpace.class), port, ZkServer.DEFAULT_TICK_TIME, 100);
         zkServer.start();
         return zkServer;

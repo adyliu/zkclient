@@ -35,19 +35,27 @@ public class ZkServer {
     private final static Logger LOG = Logger.getLogger(ZkServer.class);
 
     public static final int DEFAULT_PORT = 2181;
+
     public static final int DEFAULT_TICK_TIME = 5000;
+
     public static final int DEFAULT_MIN_SESSION_TIMEOUT = 2 * DEFAULT_TICK_TIME;
 
     private String _dataDir;
+
     private String _logDir;
 
     private IDefaultNameSpace _defaultNameSpace;
 
     private ZooKeeperServer _zk;
+
     private Factory _nioFactory;
+
     private ZkClient _zkClient;
+
     private int _port;
+
     private int _tickTime;
+
     private int _minSessionTimeout;
 
     public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace) {
@@ -57,9 +65,10 @@ public class ZkServer {
     public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace, int port) {
         this(dataDir, logDir, defaultNameSpace, port, DEFAULT_TICK_TIME);
     }
-   public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace, int port, int tickTime) {
-      this(dataDir, logDir, defaultNameSpace, port, tickTime, DEFAULT_MIN_SESSION_TIMEOUT);
-   }
+
+    public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace, int port, int tickTime) {
+        this(dataDir, logDir, defaultNameSpace, port, tickTime, DEFAULT_MIN_SESSION_TIMEOUT);
+    }
 
     public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace, int port, int tickTime, int minSessionTimeout) {
         _dataDir = dataDir;
@@ -67,7 +76,7 @@ public class ZkServer {
         _defaultNameSpace = defaultNameSpace;
         _port = port;
         _tickTime = tickTime;
-       _minSessionTimeout = minSessionTimeout;
+        _minSessionTimeout = minSessionTimeout;
     }
 
     public int getPort() {
@@ -131,7 +140,7 @@ public class ZkServer {
     private void startSingleZkServer(final int tickTime, final File dataDir, final File dataLogDir, final int port) {
         try {
             _zk = new ZooKeeperServer(dataDir, dataLogDir, tickTime);
-           _zk.setMinSessionTimeout(_minSessionTimeout);
+            _zk.setMinSessionTimeout(_minSessionTimeout);
             _nioFactory = new NIOServerCnxn.Factory(new InetSocketAddress(port));
             _nioFactory.startup(_zk);
         } catch (IOException e) {
@@ -160,6 +169,14 @@ public class ZkServer {
         }
         if (_zk != null) {
             _zk.shutdown();
+            if (_zk.getZKDatabase() != null) {
+                try {
+                    //release file description
+                    _zk.getZKDatabase().close();
+                } catch (IOException e) {
+                    LOG.error(e.getMessage(), e);
+                }
+            }
             _zk = null;
         }
         LOG.info("Shutting down ZkServer...done");
