@@ -25,8 +25,10 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.github.zkclient.IDefaultNameSpace;
 import org.github.zkclient.ZkServer;
+import org.junit.Ignore;
 import org.mockito.exceptions.base.MockitoAssertionError;
 
+@Ignore
 public class TestUtil {
 
     /**
