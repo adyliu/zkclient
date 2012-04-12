@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>zkclient</groupId>
     <artifactId>zkclient</artifactId>
     <name>zkclient</name>
     <version>1.0</version>
     <packaging>jar</packaging>
     <description />
-
-    <prerequisites>
-    </prerequisites>
-
+    <developers>
+        <developer>
+            <id>imxylz</id>
+            <name>Ady Liu</name>
+            <email>imxylz@gmail.com</email>
+            <url>https://github.com/adyliu</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>pvoss </id>
+            <name>Peter Voss</name>
+            <email>info@petervoss.org</email>
+            <url>https://github.com/sgroschupf/zkclient</url>
+            <roles>
+                <role>origin author</role>
+            </roles>
+        </developer>
+    </developers>
     <dependencies>
         <dependency>
-            <groupId>org.apache.hadoop.zookeeper</groupId>
+            <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
             <version>3.3.1</version>
         </dependency>
@@ -44,7 +58,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -103,4 +116,3 @@
         </plugins>
     </build>
 </project>
-
