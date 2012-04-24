@@ -5,7 +5,7 @@
 	<groupId>org.github.zkclient</groupId>
 	<artifactId>zkclient</artifactId>
 	<name>zkclient</name>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.1</version>
 	<packaging>jar</packaging>
 	<description >A zookeeper(http://zookeeper.apache.org) client wrapper.</description>
 	<developers>
