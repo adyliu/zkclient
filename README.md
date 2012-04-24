@@ -6,8 +6,9 @@
     The origin author is Peter Voss(https://github.com/pvoss).
 
 ##Maven Dependency
+
         <dependency>
-            <groupId>org.github.zkclient</groupId>
+            <groupId>com.github.zkclient</groupId>
             <artifactId>zkclient</artifactId>
             <version>1.1</version>
         </dependency>

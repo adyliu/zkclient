@@ -2,12 +2,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.github.zkclient</groupId>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+	<groupId>com.github.zkclient</groupId>
 	<artifactId>zkclient</artifactId>
 	<name>zkclient</name>
 	<version>1.1</version>
 	<packaging>jar</packaging>
-	<description >A zookeeper(http://zookeeper.apache.org) client wrapper.</description>
+	<description>A zookeeper(http://zookeeper.apache.org) client wrapper.</description>
+	<url>https://github.com/adyliu/zkclient</url>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git@github.com:adyliu/zkclient.git</connection>
+		<developerConnection>scm:git:git@github.com:adyliu/zkclient.git</developerConnection>
+		<url>git@github.com:adyliu/zkclient.git</url>
+	</scm>
 	<developers>
 		<developer>
 			<id>imxylz</id>
@@ -89,11 +108,27 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+					<links>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
+					</links>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-	<url>https://github.com/adyliu/zkclient</url>
-	<scm>
-		<url>https://adyliu@github.com/adyliu/zkclient.git</url>
-		<connection>git@github.com:adyliu/zkclient.git</connection>
-	</scm>
 </project>
