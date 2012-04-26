@@ -8,7 +8,7 @@
 ##Maven Dependency
 
         <dependency>
-            <groupId>com.github.zkclient</groupId>
+            <groupId>com.github.adyliu</groupId>
             <artifactId>zkclient</artifactId>
             <version>1.1</version>
         </dependency>
