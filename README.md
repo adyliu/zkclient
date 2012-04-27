@@ -7,8 +7,10 @@
 
 ##Maven Dependency
 
+The version 1.0 has been synchronized to Maven Central Repository.
+
         <dependency>
             <groupId>com.github.adyliu</groupId>
             <artifactId>zkclient</artifactId>
-            <version>1.1</version>
+            <version>1.0</version>
         </dependency>
