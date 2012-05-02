@@ -45,7 +45,7 @@ import com.github.zkclient.util.ZkPathUtil;
 public class InMemoryConnection implements IZkConnection {
 
     private Lock _lock = new ReentrantLock(true);
-    private Map<String, byte[]> _data = new HashMap<String, byte[]>();
+    private Map<String, DataWithVersion> _data = new HashMap<String, DataWithVersion>();
     private Map<String, Long> _creationTime = new HashMap<String, Long>();
     private final AtomicInteger sequence = new AtomicInteger(0);
 
@@ -131,7 +131,7 @@ public class InMemoryConnection implements IZkConnection {
             if (exists(path, false)) {
                 throw new KeeperException.NodeExistsException();
             }
-            _data.put(path, data);
+            _data.put(path, new DataWithVersion(data, 0));
             _creationTime.put(path, System.currentTimeMillis());
             checkWatch(_nodeWatches, path, EventType.NodeCreated);
             // we also need to send a child change event for the parent
@@ -236,25 +236,30 @@ public class InMemoryConnection implements IZkConnection {
         }
         _lock.lock();
         try {
-            byte[] bs = _data.get(path);
-            if (bs == null) {
+            DataWithVersion dataWithVersion = _data.get(path);
+            if (dataWithVersion == null) {
                 throw new ZkNoNodeException(new KeeperException.NoNodeException());
             }
-            return bs;
+            if(stat != null) {
+                stat.setVersion(dataWithVersion.version);
+            }
+            return dataWithVersion.data;
         } finally {
             _lock.unlock();
         }
     }
 
     @Override
-    public void writeData(String path, byte[] data, int expectedVersion) throws KeeperException, InterruptedException {
+    public Stat writeData(String path, byte[] data, int expectedVersion) throws KeeperException, InterruptedException {
         _lock.lock();
+        int newVersion = -1;
         try {
             checkWatch(_dataWatches, path, EventType.NodeDataChanged);
             if (!exists(path, false)) {
                 throw new KeeperException.NoNodeException();
             }
-            _data.put(path, data);
+            newVersion = _data.get(path).version + 1;
+            _data.put(path, new DataWithVersion(data, newVersion));
             String parentPath = getParentPath(path);
             if (parentPath != null) {
                 checkWatch(_nodeWatches, parentPath, EventType.NodeChildrenChanged);
@@ -262,6 +267,9 @@ public class InMemoryConnection implements IZkConnection {
         } finally {
             _lock.unlock();
         }
+        Stat stat = new Stat();
+        stat.setVersion(newVersion);
+        return stat;
     }
 
     private void checkWatch(Set<String> watches, String path, EventType eventType) {

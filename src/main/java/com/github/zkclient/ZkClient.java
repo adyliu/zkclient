@@ -776,8 +776,8 @@ public class ZkClient implements Watcher {
         return (T) derializable(data);
     }
 
-    public void writeData(String path, Object object) {
-        writeData(path, object, -1);
+    public Stat writeData(String path, Object object) {
+        return writeData(path, object, -1);
     }
 
     /**
@@ -808,14 +808,12 @@ public class ZkClient implements Watcher {
         } while (retry);
     }
 
-    public void writeData(final String path, Object datat, final int expectedVersion) {
+    public Stat writeData(final String path, Object datat, final int expectedVersion) {
         final byte[] data = serialize(datat);
-        retryUntilConnected(new Callable<Object>() {
-
+        return retryUntilConnected(new Callable<Stat>() {
             @Override
-            public Object call() throws Exception {
-                _connection.writeData(path, data, expectedVersion);
-                return null;
+            public Stat call() throws Exception {
+               return  _connection.writeData(path, data, expectedVersion);
             }
         });
     }
