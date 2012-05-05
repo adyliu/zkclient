@@ -7,10 +7,14 @@
 
 ##Maven Dependency
 
-The version 1.0 has been synchronized to Maven Central Repository.
+The version 2.0 has been synchronized to Maven Central Repository.
 
         <dependency>
             <groupId>com.github.adyliu</groupId>
             <artifactId>zkclient</artifactId>
-            <version>1.0</version>
+            <version>2.0</version>
         </dependency>
+
+The version 2.x needs zookeeper 3.4.x.
+
+The version [1.x](https://github.com/adyliu/zookeeper) needs zookeeper 3.3.x.
