@@ -24,12 +24,13 @@ import org.apache.log4j.Logger;
 import com.github.zkclient.exception.ZkInterruptedException;
 
 /**
- * All listeners registered at the {@link ZkClient} will be notified from this event thread. This is to prevent
- * dead-lock situations. The {@link ZkClient} pulls some information out of the {@link ZooKeeper} events to signal
- * {@link ZkLock} conditions. Re-using the {@link ZooKeeper} event thread to also notify {@link ZkClient} listeners,
- * would stop the ZkClient from receiving events from {@link ZooKeeper} as soon as one of the listeners blocks (because
- * it is waiting for something). {@link ZkClient} would then for instance not be able to maintain it's connection state
- * anymore.
+ * All listeners registered at the {@link ZkClient} will be notified from this event thread.
+ * This is to prevent dead-lock situations. The {@link ZkClient} pulls some information out of
+ * the {@link ZooKeeper} events to signal {@link ZkLock} conditions. Re-using the
+ * {@link ZooKeeper} event thread to also notify {@link ZkClient} listeners, would stop the
+ * ZkClient from receiving events from {@link ZooKeeper} as soon as one of the listeners blocks
+ * (because it is waiting for something). {@link ZkClient} would then for instance not be able
+ * to maintain it's connection state anymore.
  */
 class ZkEventThread extends Thread {
 
@@ -38,6 +39,8 @@ class ZkEventThread extends Thread {
     private BlockingQueue<ZkEvent> _events = new LinkedBlockingQueue<ZkEvent>();
 
     private static AtomicInteger _eventId = new AtomicInteger(0);
+
+    private volatile boolean shutdown = false;
 
     static abstract class ZkEvent {
 
@@ -64,16 +67,16 @@ class ZkEventThread extends Thread {
     public void run() {
         LOG.info("Starting ZkClient event thread.");
         try {
-            while (!isInterrupted()) {
+            while (!isShutdown()) {
                 ZkEvent zkEvent = _events.take();
                 int eventId = _eventId.incrementAndGet();
                 LOG.debug("Delivering event #" + eventId + " " + zkEvent);
                 try {
                     zkEvent.run();
                 } catch (InterruptedException e) {
-                    interrupt();
+                    shutdown();
                 } catch (ZkInterruptedException e) {
-                    interrupt();
+                    shutdown();
                 } catch (Throwable e) {
                     LOG.error("Error handling event " + zkEvent, e);
                 }
@@ -84,8 +87,20 @@ class ZkEventThread extends Thread {
         }
     }
 
+    /**
+     * @return the shutdown
+     */
+    public boolean isShutdown() {
+        return shutdown || isInterrupted();
+    }
+
+    public void shutdown() {
+        this.shutdown = true;
+        this.interrupt();
+    }
+
     public void send(ZkEvent event) {
-        if (!isInterrupted()) {
+        if (!isShutdown()) {
             LOG.debug("New event: " + event);
             _events.add(event);
         }

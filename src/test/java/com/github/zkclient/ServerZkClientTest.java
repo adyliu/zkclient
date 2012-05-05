@@ -216,7 +216,7 @@ public class ServerZkClientTest extends AbstractBaseZkClientTest {
         };
 
         thread.start();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             assertEquals(0, _client.countChildren("/test"));
         }
         thread.interrupt();
@@ -231,7 +231,7 @@ public class ServerZkClientTest extends AbstractBaseZkClientTest {
         assertEquals(0, stat.getVersion());
         assertTrue(stat.getDataLength() > 0);
     }
-
+     
     @Test
     public void testWriteDataWithExpectedVersion() {
         _client.createPersistent("/a", "data");
@@ -264,7 +264,7 @@ public class ServerZkClientTest extends AbstractBaseZkClientTest {
         _client.createPersistent("/a", 0);
 
         int numberOfThreads = 2;
-        final int numberOfIncrementsPerThread = 100;
+        final int numberOfIncrementsPerThread = Runtime.getRuntime().availableProcessors()*5;
 
         List<Thread> threads = new ArrayList<Thread>();
         for (int i = 0; i < numberOfThreads; i++) {

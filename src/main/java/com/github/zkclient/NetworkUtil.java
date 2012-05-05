@@ -18,9 +18,11 @@ package com.github.zkclient;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -91,9 +93,12 @@ public class NetworkUtil {
 
     public static boolean isPortFree(int port) {
         try {
-            Socket socket = new Socket("localhost", port);
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress("localhost", port), 200);
             socket.close();
             return false;
+        } catch (SocketTimeoutException e) {
+            return true;
         } catch (ConnectException e) {
             return true;
         } catch (SocketException e) {

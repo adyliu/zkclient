@@ -32,6 +32,9 @@ import com.github.zkclient.ZkServer;
 @Ignore
 public class TestUtil {
 
+    static {
+        System.setProperty("zookeeper.preAllocSize", "1024");//1M data log
+    }
     /**
      * This waits until the provided {@link Callable} returns an object that is equals to the given expected value or
      * the timeout has been reached. In both cases this method will return the return value of the latest

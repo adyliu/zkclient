@@ -17,16 +17,14 @@ package com.github.zkclient;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
-import org.apache.zookeeper.server.NIOServerCnxn;
+import org.apache.zookeeper.server.ServerCnxnFactory;
 import org.apache.zookeeper.server.ZooKeeperServer;
-import org.apache.zookeeper.server.NIOServerCnxn.Factory;
 
 import com.github.zkclient.exception.ZkException;
 import com.github.zkclient.exception.ZkInterruptedException;
@@ -49,7 +47,7 @@ public class ZkServer {
 
     private ZooKeeperServer _zk;
 
-    private Factory _nioFactory;
+    private ServerCnxnFactory _nioFactory;
 
     private ZkClient _zkClient;
 
@@ -142,7 +140,7 @@ public class ZkServer {
         try {
             _zk = new ZooKeeperServer(dataDir, dataLogDir, tickTime);
             _zk.setMinSessionTimeout(_minSessionTimeout);
-            _nioFactory = new NIOServerCnxn.Factory(new InetSocketAddress(port));
+            _nioFactory =ServerCnxnFactory.createFactory(port,60);
             _nioFactory.startup(_zk);
         } catch (IOException e) {
             throw new ZkException("Unable to start single ZooKeeper server.", e);

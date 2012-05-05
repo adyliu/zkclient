@@ -23,6 +23,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.Op;
+import org.apache.zookeeper.OpResult;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
@@ -104,6 +106,10 @@ public class ZkConnection implements IZkConnection {
         return _zk.getData(path, watch, stat);
     }
 
+    public  List<OpResult> multi(Iterable<Op> ops) throws InterruptedException, KeeperException {
+        return _zk.multi(ops);
+    }
+    
     public Stat writeData(String path, byte[] data) throws KeeperException, InterruptedException {
         return writeData(path, data, -1);
     }

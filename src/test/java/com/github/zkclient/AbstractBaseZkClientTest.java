@@ -146,7 +146,7 @@ public abstract class AbstractBaseZkClientTest {
             public String call() throws Exception {
                 return holder.get();
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 2);
 
         assertEquals("aaa", contentFromHolder);
     }
