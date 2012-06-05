@@ -30,19 +30,29 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.zkclient.DistributedQueue;
-import com.github.zkclient.ZkClient;
-import com.github.zkclient.ZkServer;
+import com.github.zkclient.exception.ZkMarshallingError;
+import com.github.zkclient.serialize.SerializableSerializer;
+import com.github.zkclient.serialize.ZkSerializer;
 
 public class DistributedQueueTest {
 
     private ZkServer _zkServer;
-    private ZkClient _zkClient;
+    private IZkClient<Long> _zkClient;
 
     @Before
     public void setUp() throws IOException {
         _zkServer = TestUtil.startZkServer("ZkClientTest-testDistributedQueue", 4711);
-        _zkClient = _zkServer.getZkClient();
+        _zkClient = new AbstractZkClient<Long>("localhost:4711",30000,30000,new ZkSerializer<Long>() {
+            final SerializableSerializer adapter = new SerializableSerializer();
+            @Override
+            public Long deserialize(byte[] bytes) throws ZkMarshallingError {
+                return (Long)adapter.deserialize(bytes);
+            }
+            @Override
+            public byte[] serialize(Long data) throws ZkMarshallingError {
+                return adapter.serialize(data);
+            }
+        }) {};
     }
 
     @After

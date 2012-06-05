@@ -45,10 +45,10 @@ public class ZkClientSerializationTest {
 
     @Test
     public void testSerializables() throws Exception {
-        ZkClient zkClient = new ZkClient(_zk.getZkServerAddress(), 2000, 2000, new SerializableSerializer());
+        AbstractZkClient<Object> zkClient = new AbstractZkClient<Object>(_zk.getZkServerAddress(), 2000, 2000, new SerializableSerializer()) {};
         String data = "hello world";
         zkClient.createPersistent("/a", data);
-        String readData = zkClient.readData("/a");
+        Object readData = zkClient.readData("/a");
         assertEquals(data, readData);
     }
 }

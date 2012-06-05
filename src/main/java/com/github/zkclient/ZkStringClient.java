@@ -15,40 +15,41 @@
  */
 package com.github.zkclient;
 
-import com.github.zkclient.serialize.BytesPushThroughSerializer;
+import com.github.zkclient.serialize.StringSeralizer;
 import com.github.zkclient.serialize.ZkSerializer;
 
 /**
- * Abstracts the interaction with zookeeper and allows permanent (not just one time) watches on nodes in ZooKeeper
+ * Zookeeper client with string encoder
+ * @since 2.0
  */
-public class ZkClient extends AbstractZkClient<byte[]> {
+public class ZkStringClient extends AbstractZkClient<String> {
 
-    public ZkClient(String zkServers) {
-        this(zkServers,DEFAULT_CONNECTION_TIMEOUT);
+    public ZkStringClient(String zkServers) {
+        this(zkServers, DEFAULT_CONNECTION_TIMEOUT);
     }
 
-    public ZkClient(String zkServers, int connectionTimeout) {
+    public ZkStringClient(String zkServers, int connectionTimeout) {
         this(new ZkConnection(zkServers), connectionTimeout);
     }
 
-    public ZkClient(String zkServers, int sessionTimeout, int connectionTimeout) {
+    public ZkStringClient(String zkServers, int sessionTimeout, int connectionTimeout) {
         this(new ZkConnection(zkServers, sessionTimeout), connectionTimeout);
     }
 
-    public ZkClient(String zkServers, int sessionTimeout, int connectionTimeout, ZkSerializer<byte[]> zkSerializer) {
+    public ZkStringClient(String zkServers, int sessionTimeout, int connectionTimeout, ZkSerializer<String> zkSerializer) {
         this(new ZkConnection(zkServers, sessionTimeout), connectionTimeout, zkSerializer);
     }
 
-    public ZkClient(IZkConnection connection) {
-        this(connection,DEFAULT_CONNECTION_TIMEOUT);
+    public ZkStringClient(IZkConnection connection) {
+        this(connection, DEFAULT_CONNECTION_TIMEOUT);
     }
 
-    public ZkClient(IZkConnection connection, int connectionTimeout) {
-        this(connection, connectionTimeout, new BytesPushThroughSerializer());
+    public ZkStringClient(IZkConnection connection, int connectionTimeout) {
+        this(connection, connectionTimeout, new StringSeralizer());
     }
 
-    public ZkClient(IZkConnection zkConnection, int connectionTimeout, ZkSerializer<byte[]> zkSerializer) {
+    public ZkStringClient(IZkConnection zkConnection, int connectionTimeout, ZkSerializer<String> zkSerializer) {
         super(zkConnection, connectionTimeout, zkSerializer);
     }
-  
+
 }

@@ -23,7 +23,7 @@ import java.io.ObjectOutputStream;
 
 import com.github.zkclient.exception.ZkMarshallingError;
 
-public class SerializableSerializer implements ZkSerializer {
+public class SerializableSerializer implements ZkSerializer<Object> {
 
     @Override
     public Object deserialize(byte[] bytes) throws ZkMarshallingError {

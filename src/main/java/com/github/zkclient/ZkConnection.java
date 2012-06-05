@@ -139,4 +139,9 @@ public class ZkConnection implements IZkConnection {
     public String getServers() {
         return _servers;
     }
+    
+    @Override
+    public ZooKeeper getZooKeeper() {
+        return _zk;
+    }
 }

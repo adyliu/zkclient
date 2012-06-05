@@ -29,6 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -291,5 +292,10 @@ public class InMemoryConnection implements IZkConnection {
     @Override
     public String getServers() {
         return "mem";
+    }
+    
+    @Override
+    public ZooKeeper getZooKeeper() {
+        return null;
     }
 }

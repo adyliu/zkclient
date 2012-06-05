@@ -19,15 +19,12 @@ import org.apache.zookeeper.CreateMode;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.zkclient.InMemoryConnection;
-import com.github.zkclient.ZkClient;
-
 public class MemoryZkClientTest extends AbstractBaseZkClientTest {
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        _client = new ZkClient(new InMemoryConnection());
+        _client = new ZkStringClient(new InMemoryConnection());
     }
 
     @Override

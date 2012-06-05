@@ -24,9 +24,9 @@ import com.github.zkclient.exception.ZkMarshallingError;
  * @see BytesPushThroughSerializer
  * @see SerializableSerializer
  */
-public interface ZkSerializer {
+public interface ZkSerializer<T> {
 
-    public byte[] serialize(Object data) throws ZkMarshallingError;
+    public byte[] serialize(T data) throws ZkMarshallingError;
 
-    public Object deserialize(byte[] bytes) throws ZkMarshallingError;
+    public T deserialize(byte[] bytes) throws ZkMarshallingError;
 }

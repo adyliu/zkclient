@@ -44,7 +44,7 @@ public abstract class AbstractBaseZkClientTest {
 
     protected static final Logger LOG = Logger.getLogger(AbstractBaseZkClientTest.class);
     protected ZkServer _zkServer;
-    protected ZkClient _client;
+    protected ZkStringClient _client;
 
     @Before
     public void setUp() throws Exception {

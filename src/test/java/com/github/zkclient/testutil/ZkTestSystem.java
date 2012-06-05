@@ -111,8 +111,5 @@ public class ZkTestSystem extends ExternalResource {
         return new ZkClient("localhost:" + PORT);
     }
 
-    public void showStructure() {
-        getZkClient().showFolders(System.out);
-    }
 
 }

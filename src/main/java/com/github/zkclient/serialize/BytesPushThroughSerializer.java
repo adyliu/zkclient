@@ -20,16 +20,16 @@ import com.github.zkclient.exception.ZkMarshallingError;
 /**
  * A {@link ZkSerializer} which simply passes byte arrays to zk and back.
  */
-public class BytesPushThroughSerializer implements ZkSerializer {
+public class BytesPushThroughSerializer implements ZkSerializer<byte[]> {
 
     @Override
-    public Object deserialize(byte[] bytes) throws ZkMarshallingError {
+    public byte[] deserialize(byte[] bytes) throws ZkMarshallingError {
         return bytes;
     }
 
     @Override
-    public byte[] serialize(Object bytes) throws ZkMarshallingError {
-        return (byte[]) bytes;
+    public byte[] serialize(byte[] bytes) throws ZkMarshallingError {
+        return bytes;
     }
 
 }

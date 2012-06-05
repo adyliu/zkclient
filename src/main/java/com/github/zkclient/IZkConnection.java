@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooKeeper.States;
 import org.apache.zookeeper.data.Stat;
 
@@ -46,4 +47,6 @@ public interface IZkConnection {
     public long getCreateTime(String path) throws KeeperException, InterruptedException;
 
     public String getServers();
+    
+    ZooKeeper getZooKeeper();
 }

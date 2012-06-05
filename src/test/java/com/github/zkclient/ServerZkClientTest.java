@@ -50,7 +50,7 @@ public class ServerZkClientTest extends AbstractBaseZkClientTest {
     public void setUp() throws Exception {
         super.setUp();
         _zkServer = TestUtil.startZkServer("ZkClientTest_" + _counter.addAndGet(1), 4711);
-        _client = new ZkClient("localhost:4711", 5000);
+        _client = new ZkStringClient("localhost:4711", 5000);
     }
 
     @Override
@@ -261,7 +261,7 @@ public class ServerZkClientTest extends AbstractBaseZkClientTest {
 
     @Test
     public void testUpdateSerialized() throws InterruptedException {
-        _client.createPersistent("/a", 0);
+        _client.createPersistent("/a", "0");
 
         int numberOfThreads = 2;
         final int numberOfIncrementsPerThread = Runtime.getRuntime().availableProcessors()*5;
@@ -272,11 +272,12 @@ public class ServerZkClientTest extends AbstractBaseZkClientTest {
                 @Override
                 public void run() {
                     for (int j = 0; j < numberOfIncrementsPerThread; j++) {
-                        _client.updateDataSerialized("/a", new DataUpdater<Integer>() {
+                        _client.updateDataSerialized("/a", new DataUpdater<String>() {
 
                             @Override
-                            public Integer update(Integer integer) {
-                                return integer + 1;
+                            public String update(String oldValue) {
+                                int oldInt = Integer.parseInt(oldValue);
+                                return String.valueOf(oldInt+1);
                             }
                         });
                     }
@@ -290,7 +291,7 @@ public class ServerZkClientTest extends AbstractBaseZkClientTest {
             thread.join();
         }
 
-        Integer finalValue = _client.readData("/a");
-        assertEquals(numberOfIncrementsPerThread * numberOfThreads, finalValue.intValue());
+        String finalValue = _client.readData("/a");
+        assertEquals(numberOfIncrementsPerThread * numberOfThreads, Integer.parseInt(finalValue));
     }
 }

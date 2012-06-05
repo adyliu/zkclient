@@ -15,12 +15,11 @@
  */
 package com.github.zkclient;
 
-import java.io.Serializable;
 import java.util.List;
 
 import com.github.zkclient.exception.ZkNoNodeException;
 
-public class DistributedQueue<T extends Serializable> {
+public class DistributedQueue<T> {
 
     private static class Element<T> {
         private String _name;
@@ -40,12 +39,12 @@ public class DistributedQueue<T extends Serializable> {
         }
     }
 
-    private ZkClient _zkClient;
+    private IZkClient<T> _zkClient;
     private String _root;
 
     private static final String ELEMENT_NAME = "element";
 
-    public DistributedQueue(ZkClient zkClient, String root) {
+    public DistributedQueue(IZkClient<T> zkClient, String root) {
         _zkClient = zkClient;
         _root = root;
     }
@@ -93,7 +92,6 @@ public class DistributedQueue<T extends Serializable> {
         return _zkClient.getChildren(_root).size() == 0;
     }
 
-    @SuppressWarnings("unchecked")
     private Element<T> getFirstElement() {
         try {
             while (true) {

@@ -25,25 +25,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.zkclient.ContentWatcher;
-import com.github.zkclient.Gateway;
-import com.github.zkclient.Holder;
-import com.github.zkclient.ZkClient;
-import com.github.zkclient.ZkServer;
-
 public class ContentWatcherTest {
 
     private static final Logger LOG = Logger.getLogger(ContentWatcherTest.class);
 
     private static final String FILE_NAME = "/ContentWatcherTest";
     private ZkServer _zkServer;
-    private ZkClient _zkClient;
+    private ZkStringClient _zkClient;
 
     @Before
     public void setUp() throws Exception {
         LOG.info("------------ BEFORE -------------");
         _zkServer = TestUtil.startZkServer("ContentWatcherTest", 4711);
-        _zkClient = _zkServer.getZkClient();
+        _zkClient = new ZkStringClient("localhost:4711");
     }
 
     @After
@@ -122,7 +116,7 @@ public class ContentWatcherTest {
         LOG.info("--- testHandlingOfConnectionLoss");
         final Gateway gateway = new Gateway(4712, 4711);
         gateway.start();
-        final ZkClient zkClient = new ZkClient("localhost:4712", 5000);
+        final ZkStringClient zkClient = new ZkStringClient("localhost:4712", 5000);
 
         // disconnect
         gateway.stop();

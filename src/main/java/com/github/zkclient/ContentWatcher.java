@@ -27,7 +27,7 @@ import com.github.zkclient.exception.ZkNoNodeException;
  * @param <T>
  *            The data type that is being watched.
  */
-public final class ContentWatcher<T extends Object> implements IZkDataListener {
+public final class ContentWatcher<T> implements IZkDataListener {
 
     private static final Logger LOG = Logger.getLogger(ContentWatcher.class);
 
@@ -36,9 +36,9 @@ public final class ContentWatcher<T extends Object> implements IZkDataListener {
 
     private Holder<T> _content;
     private String _fileName;
-    private ZkClient _zkClient;
+    private IZkClient<T> _zkClient;
 
-    public ContentWatcher(ZkClient zkClient, String fileName) {
+    public ContentWatcher(IZkClient<T> zkClient, String fileName) {
         _fileName = fileName;
         _zkClient = zkClient;
     }
@@ -49,7 +49,6 @@ public final class ContentWatcher<T extends Object> implements IZkDataListener {
         LOG.debug("Started ContentWatcher");
     }
 
-    @SuppressWarnings("unchecked")
     private void readData() {
         try {
             setContent((T) _zkClient.readData(_fileName));
