@@ -17,6 +17,7 @@
 
 package com.github.zkclient;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,10 +33,11 @@ import com.github.zkclient.exception.ZkNodeExistsException;
 import com.github.zkclient.exception.ZkTimeoutException;
 
 /**
+ * zookeeper client wrapper
  * @author adyliu (imxylz@gmail.com)
  * @since 2.0
  */
-public interface IZkClient<T> {
+public interface IZkClient<T> extends Closeable{
 
     int DEFAULT_CONNECTION_TIMEOUT = 10000;
 
@@ -43,8 +45,7 @@ public interface IZkClient<T> {
 
     /**
      * Close the client.
-     * 
-     * @throws ZkInterruptedException
+     * @throws ZkInterruptedException if interrupted while closing
      */
     void close();
 
@@ -52,7 +53,7 @@ public interface IZkClient<T> {
      * Connect to ZooKeeper.
      * 
      * @param maxMsToWaitUntilConnected
-     * @param watcher
+     * @param watcher default watcher
      * @throws ZkInterruptedException if the connection timed out due to thread interruption
      * @throws ZkTimeoutException if the connection timed out
      * @throws IllegalStateException if the connection timed out due to thread interruption
@@ -63,7 +64,7 @@ public interface IZkClient<T> {
     /**
      * Counts number of children for the given path.
      * 
-     * @param path
+     * @param path zk path
      * @return number of children or 0 if path does not exist.
      */
     int countChildren(String path);
@@ -71,10 +72,10 @@ public interface IZkClient<T> {
     /**
      * Create a node.
      * 
-     * @param path
-     * @param data
-     * @param mode
-     * @return create node's path
+     * @param path zk path
+     * @param data node data
+     * @param mode create mode {@link CreateMode}
+     * @return created path
      * @throws ZkInterruptedException if operation was interrupted, or a required reconnection
      *         got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
@@ -86,9 +87,9 @@ public interface IZkClient<T> {
             IllegalArgumentException, ZkException, RuntimeException;
 
     /**
-     * Create an ephemeral node.
+     * Create an ephemeral node with empty data
      * 
-     * @param path
+     * @param path zk path
      * @throws ZkInterruptedException if operation was interrupted, or a required reconnection
      *         got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
@@ -102,8 +103,8 @@ public interface IZkClient<T> {
     /**
      * Create an ephemeral node.
      * 
-     * @param path
-     * @param data
+     * @param path zk path
+     * @param data node data
      * @throws ZkInterruptedException if operation was interrupted, or a required reconnection
      *         got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
@@ -131,9 +132,9 @@ public interface IZkClient<T> {
             IllegalArgumentException, ZkException, RuntimeException;
 
     /**
-     * Create a persistent node.
+     * Create a persistent node with empty data
      * 
-     * @param path
+     * @param path zk path
      * @throws ZkInterruptedException if operation was interrupted, or a required reconnection
      *         got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
@@ -147,7 +148,7 @@ public interface IZkClient<T> {
     /**
      * Create a persistent node.
      * 
-     * @param path
+     * @param path zk path
      * @param createParents if true all parent dirs are created as well and no
      *        {@link ZkNodeExistsException} is thrown in case the path already exists
      * @throws ZkInterruptedException if operation was interrupted, or a required reconnection
@@ -163,8 +164,8 @@ public interface IZkClient<T> {
     /**
      * Create a persistent node.
      * 
-     * @param path
-     * @param data
+     * @param path zk path
+     * @param data node data
      * @throws ZkInterruptedException if operation was interrupted, or a required reconnection
      *         got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
@@ -178,8 +179,8 @@ public interface IZkClient<T> {
     /**
      * Create a persistent, sequental node.
      * 
-     * @param path
-     * @param data
+     * @param path zk path
+     * @param data node data
      * @return create node's path
      * @throws ZkInterruptedException if operation was interrupted, or a required reconnection
      *         got interrupted
@@ -190,19 +191,28 @@ public interface IZkClient<T> {
      */
     String createPersistentSequential(String path, T data) throws ZkInterruptedException, IllegalArgumentException,
             ZkException, RuntimeException;
-
+    /**
+     * delete a node
+     * @param path zk path
+     * @return true if deleted; otherwise false
+     */
     boolean delete(final String path);
-
+    /**
+     * delete a node with all children
+     * @param path zk path
+     * @return true if all deleted; otherwise false
+     */
     boolean deleteRecursive(String path);
 
     boolean exists(final String path);
 
     List<String> getChildren(String path);
 
-    List<String> getChildren(final String path, final boolean watch);
-
     long getCreationTime(String path);
-
+    /**
+     * all watcher number in this connection
+     * @return watcher number
+     */
     int numberOfListeners();
 
     T readData(String path);
@@ -246,17 +256,6 @@ public interface IZkClient<T> {
     boolean waitUntilConnected(long time, TimeUnit timeUnit);
 
     boolean waitUntilExists(String path, TimeUnit timeUnit, long time);
-
-    /**
-     * Installs a child watch for the given path.
-     * 
-     * @param path
-     * @return the current children of the path or null if the zk node with the given path
-     *         doesn't exist.
-     */
-    List<String> watchForChilds(final String path);
-
-    void watchForData(final String path);
 
     Stat writeData(String path, T object);
 
