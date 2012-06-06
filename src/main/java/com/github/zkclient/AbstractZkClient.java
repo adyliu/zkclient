@@ -756,19 +756,7 @@ public abstract class AbstractZkClient<T> implements Watcher, IZkClient<T> {
         return writeData(path, object, -1);
     }
 
-    /**
-     * Updates data of an existing znode. The current content of the znode is passed to the
-     * {@link DataUpdater} that is passed into this method, which returns the new content. The
-     * new content is only written back to ZooKeeper if nobody has modified the given znode in
-     * between. If a concurrent change has been detected the new data of the znode is passed to
-     * the updater once again until the new contents can be successfully written back to
-     * ZooKeeper.
-     * 
-     * @param <T>
-     * @param path The path of the znode.
-     * @param updater Updater that creates the new contents.
-     */
-    public void updateDataSerialized(String path, DataUpdater<T> updater) {
+    public void cas(String path, DataUpdater<T> updater) {
         Stat stat = new Stat();
         boolean retry;
         do {

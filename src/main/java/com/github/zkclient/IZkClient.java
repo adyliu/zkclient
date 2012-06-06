@@ -237,7 +237,7 @@ public interface IZkClient<T> {
      * @param path The path of the znode.
      * @param updater Updater that creates the new contents.
      */
-    void updateDataSerialized(String path, DataUpdater<T> updater);
+    void cas(String path, DataUpdater<T> updater);
 
     boolean waitForKeeperState(KeeperState keeperState, long time, TimeUnit timeUnit);
 

@@ -272,7 +272,7 @@ public class ServerZkClientTest extends AbstractBaseZkClientTest {
                 @Override
                 public void run() {
                     for (int j = 0; j < numberOfIncrementsPerThread; j++) {
-                        _client.updateDataSerialized("/a", new DataUpdater<String>() {
+                        _client.cas("/a", new DataUpdater<String>() {
 
                             @Override
                             public String update(String oldValue) {

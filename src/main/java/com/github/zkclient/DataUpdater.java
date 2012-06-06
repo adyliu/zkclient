@@ -16,11 +16,11 @@
 package com.github.zkclient;
 
 /**
- * Updates the data of a znode. This is used together with {@link ZkClient#updateDataSerialized(String, DataUpdater)}.
+ * Updates the data of a znode. This is used together with {@link IZkClient#cas(String, DataUpdater)}
  * 
  * @param <T>
  */
-public interface DataUpdater<T extends Object> {
+public interface DataUpdater<T> {
 
     /**
      * Updates the current data of a znode.
