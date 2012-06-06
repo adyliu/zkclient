@@ -96,7 +96,9 @@ public class ZkServer {
         LOG.info("Starting ZkServer on: [" + names + "] port " + _port + "...");
         startZooKeeperServer();
         _zkClient = new ZkClient("localhost:" + _port, 10000);
+        if(_defaultNameSpace!=null) {
         _defaultNameSpace.createDefaultNameSpace(_zkClient);
+        }
     }
 
     private void startZooKeeperServer() {
