@@ -43,7 +43,6 @@ public class ZkServer {
 
     private String _logDir;
 
-    private IDefaultNameSpace _defaultNameSpace;
 
     private ZooKeeperServer _zk;
 
@@ -57,22 +56,21 @@ public class ZkServer {
 
     private int _minSessionTimeout;
 
-    public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace) {
-        this(dataDir, logDir, defaultNameSpace, DEFAULT_PORT);
+    public ZkServer(String dataDir, String logDir) {
+        this(dataDir, logDir, DEFAULT_PORT);
     }
 
-    public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace, int port) {
-        this(dataDir, logDir, defaultNameSpace, port, DEFAULT_TICK_TIME);
+    public ZkServer(String dataDir, String logDir, int port) {
+        this(dataDir, logDir, port, DEFAULT_TICK_TIME);
     }
 
-    public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace, int port, int tickTime) {
-        this(dataDir, logDir, defaultNameSpace, port, tickTime, DEFAULT_MIN_SESSION_TIMEOUT);
+    public ZkServer(String dataDir, String logDir, int port, int tickTime) {
+        this(dataDir, logDir, port, tickTime, DEFAULT_MIN_SESSION_TIMEOUT);
     }
 
-    public ZkServer(String dataDir, String logDir, IDefaultNameSpace defaultNameSpace, int port, int tickTime, int minSessionTimeout) {
+    public ZkServer(String dataDir, String logDir, int port, int tickTime, int minSessionTimeout) {
         _dataDir = dataDir;
         _logDir = logDir;
-        _defaultNameSpace = defaultNameSpace;
         _port = port;
         _tickTime = tickTime;
         _minSessionTimeout = minSessionTimeout;
@@ -84,7 +82,7 @@ public class ZkServer {
 
     @PostConstruct
     public void start() {
-        final String[] localHostNames = NetworkUtil.getLocalHostNames();
+        final String[] localHostNames = ZkClientUtils.getLocalHostNames();
         String names = "";
         for (int i = 0; i < localHostNames.length; i++) {
             final String name = localHostNames[i];
@@ -96,18 +94,15 @@ public class ZkServer {
         LOG.info("Starting ZkServer on: [" + names + "] port " + _port + "...");
         startZooKeeperServer();
         _zkClient = new ZkClient("localhost:" + _port, 10000);
-        if(_defaultNameSpace!=null) {
-        _defaultNameSpace.createDefaultNameSpace(_zkClient);
-        }
     }
 
     private void startZooKeeperServer() {
-        final String[] localhostHostNames = NetworkUtil.getLocalHostNames();
+        final String[] localhostHostNames = ZkClientUtils.getLocalHostNames();
         final String servers = "localhost:" + _port;
         // check if this server needs to start a _client server.
         int pos = -1;
         LOG.debug("check if hostNames " + servers + " is in list: " + Arrays.asList(localhostHostNames));
-        if ((pos = NetworkUtil.hostNamesInList(servers, localhostHostNames)) != -1) {
+        if ((pos = ZkClientUtils.hostNamesInList(servers, localhostHostNames)) != -1) {
             // yes this server needs to start a zookeeper server
             final String[] hosts = servers.split(",");
             final String[] hostSplitted = hosts[pos].split(":");
@@ -116,7 +111,7 @@ public class ZkServer {
                 port = Integer.parseInt(hostSplitted[1]);
             }
             // check if this machine is already something running..
-            if (NetworkUtil.isPortFree(port)) {
+            if (ZkClientUtils.isPortFree(port)) {
                 final File dataDir = new File(_dataDir);
                 final File dataLogDir = new File(_logDir);
                 dataDir.mkdirs();

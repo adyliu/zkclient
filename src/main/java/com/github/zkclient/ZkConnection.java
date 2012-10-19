@@ -33,7 +33,7 @@ import org.apache.zookeeper.data.Stat;
 
 import com.github.zkclient.exception.ZkException;
 
-public class ZkConnection implements IZkConnection {
+public class ZkConnection{
 
     private static final Logger LOG = Logger.getLogger(ZkConnection.class);
 
@@ -55,7 +55,6 @@ public class ZkConnection implements IZkConnection {
         _sessionTimeOut = sessionTimeOut;
     }
 
-    @Override
     public void connect(Watcher watcher) {
         _zookeeperLock.lock();
         try {
@@ -126,7 +125,6 @@ public class ZkConnection implements IZkConnection {
         return _zk;
     }
 
-    @Override
     public long getCreateTime(String path) throws KeeperException, InterruptedException {
         Stat stat = _zk.exists(path, false);
         if (stat != null) {
@@ -135,12 +133,10 @@ public class ZkConnection implements IZkConnection {
         return -1;
     }
 
-    @Override
     public String getServers() {
         return _servers;
     }
     
-    @Override
     public ZooKeeper getZooKeeper() {
         return _zk;
     }

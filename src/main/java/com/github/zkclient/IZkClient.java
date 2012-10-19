@@ -37,7 +37,7 @@ import com.github.zkclient.exception.ZkTimeoutException;
  * @author adyliu (imxylz@gmail.com)
  * @since 2.0
  */
-public interface IZkClient<T> extends Closeable{
+public interface IZkClient extends Closeable{
 
     int DEFAULT_CONNECTION_TIMEOUT = 10000;
 
@@ -83,7 +83,7 @@ public interface IZkClient<T> extends Closeable{
      * @throws ZkException if any ZooKeeper exception occurred
      * @throws RuntimeException if any other exception occurs
      */
-    String create(final String path, T data, final CreateMode mode) throws ZkInterruptedException,
+    String create(final String path, byte[] data, final CreateMode mode) throws ZkInterruptedException,
             IllegalArgumentException, ZkException, RuntimeException;
 
     /**
@@ -112,7 +112,7 @@ public interface IZkClient<T> extends Closeable{
      * @throws ZkException if any ZooKeeper exception occurred
      * @throws RuntimeException if any other exception occurs
      */
-    void createEphemeral(final String path, final T data) throws ZkInterruptedException, IllegalArgumentException,
+    void createEphemeral(final String path, final byte[] data) throws ZkInterruptedException, IllegalArgumentException,
             ZkException, RuntimeException;
 
     /**
@@ -128,7 +128,7 @@ public interface IZkClient<T> extends Closeable{
      * @throws ZkException if any ZooKeeper exception occurred
      * @throws RuntimeException if any other exception occurs
      */
-    String createEphemeralSequential(final String path, final T data) throws ZkInterruptedException,
+    String createEphemeralSequential(final String path, final byte[] data) throws ZkInterruptedException,
             IllegalArgumentException, ZkException, RuntimeException;
 
     /**
@@ -173,7 +173,7 @@ public interface IZkClient<T> extends Closeable{
      * @throws ZkException if any ZooKeeper exception occurred
      * @throws RuntimeException if any other exception occurs
      */
-    void createPersistent(String path, T data) throws ZkInterruptedException, IllegalArgumentException, ZkException,
+    void createPersistent(String path, byte[] data) throws ZkInterruptedException, IllegalArgumentException, ZkException,
             RuntimeException;
 
     /**
@@ -189,7 +189,7 @@ public interface IZkClient<T> extends Closeable{
      * @throws ZkException if any ZooKeeper exception occurred
      * @throws RuntimeException if any other exception occurs
      */
-    String createPersistentSequential(String path, T data) throws ZkInterruptedException, IllegalArgumentException,
+    String createPersistentSequential(String path, byte[] data) throws ZkInterruptedException, IllegalArgumentException,
             ZkException, RuntimeException;
     /**
      * delete a node
@@ -215,11 +215,11 @@ public interface IZkClient<T> extends Closeable{
      */
     int numberOfListeners();
 
-    T readData(String path);
+    byte[] readData(String path);
 
-    T readData(String path, boolean returnNullIfPathNotExists);
+    byte[] readData(String path, boolean returnNullIfPathNotExists);
 
-    T readData(String path, Stat stat);
+    byte[] readData(String path, Stat stat);
 
     List<String> subscribeChildChanges(String path, IZkChildListener listener);
 
@@ -247,7 +247,7 @@ public interface IZkClient<T> extends Closeable{
      * @param path The path of the znode.
      * @param updater Updater that creates the new contents.
      */
-    void cas(String path, DataUpdater<T> updater);
+    void cas(String path, DataUpdater<byte[]> updater);
 
     boolean waitForKeeperState(KeeperState keeperState, long time, TimeUnit timeUnit);
 
@@ -257,9 +257,22 @@ public interface IZkClient<T> extends Closeable{
 
     boolean waitUntilExists(String path, TimeUnit timeUnit, long time);
 
-    Stat writeData(String path, T object);
+    Stat writeData(String path, byte[] object);
 
-    Stat writeData(final String path, T datat, final int expectedVersion);
+    Stat writeData(final String path, byte[] datat, final int expectedVersion);
     
     ZooKeeper getZooKeeper();
+    
+    interface DataUpdater<T> {
+
+        /**
+         * Updates the current data of a znode.
+         * 
+         * @param currentData
+         *            The current contents.
+         * @return the new data that should be written back to ZooKeeper.
+         */
+        public T update(T currentData);
+
+    }
 }
