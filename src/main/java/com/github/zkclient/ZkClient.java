@@ -553,7 +553,6 @@ public class ZkClient implements Watcher, IZkClient {
 
     /**
      * 
-     * @param <T>
      * @param callable
      * @return result of Callable
      * @throws ZkInterruptedException if operation was interrupted, or a required reconnection

@@ -243,7 +243,6 @@ public interface IZkClient extends Closeable{
      * the updater once again until the new contents can be successfully written back to
      * ZooKeeper.
      * 
-     * @param <T>
      * @param path The path of the znode.
      * @param updater Updater that creates the new contents.
      */
