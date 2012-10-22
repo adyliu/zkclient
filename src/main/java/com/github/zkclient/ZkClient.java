@@ -449,7 +449,7 @@ public class ZkClient implements Watcher, IZkClient {
                     // reinstall watch
                     exists(path, true);
                     try {
-                        Object data = readData(path, null, true);
+                        byte[] data = readData(path, null, true);
                         listener.handleDataChange(path, data);
                     } catch (ZkNoNodeException e) {
                         listener.handleDataDeleted(path);
