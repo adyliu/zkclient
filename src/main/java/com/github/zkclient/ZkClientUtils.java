@@ -33,6 +33,24 @@ import com.github.zkclient.exception.ZkInterruptedException;
 
 public class ZkClientUtils {
 
+    public static enum ZkVersion {
+        V33, V34
+    }
+
+    public static final ZkVersion zkVersion;
+    static {
+        ZkVersion version = null;
+        try {
+            Class.forName("org.apache.zookeeper.OpResult");
+            version = ZkVersion.V34;
+        } catch (ClassNotFoundException e) {
+            version = ZkVersion.V33;
+        } finally {
+            zkVersion = version;
+        }
+
+    }
+
     public static RuntimeException convertToRuntimeException(Throwable e) {
         if (e instanceof RuntimeException) {
             return (RuntimeException) e;
@@ -42,8 +60,9 @@ public class ZkClientUtils {
     }
 
     /**
-     * This sets the interrupt flag if the catched exception was an {@link InterruptedException}. Catching such an
-     * exception always clears the interrupt flag.
+     * This sets the interrupt flag if the catched exception was an
+     * {@link InterruptedException}. Catching such an exception always clears
+     * the interrupt flag.
      * 
      * @param catchedException
      *            The catched exception.
@@ -62,6 +81,7 @@ public class ZkClientUtils {
             throw (ZkInterruptedException) e;
         }
     }
+
     public static String leadingZeros(long number, int numberOfLeadingZeros) {
         return String.format("%0" + numberOfLeadingZeros + "d", number);
     }
@@ -78,7 +98,8 @@ public class ZkClientUtils {
         return builder.toString();
     }
 
-    private static void addChildrenToStringBuilder(ZkClient zkClient, PathFilter pathFilter, final int level, final StringBuilder builder, final String startPath) {
+    private static void addChildrenToStringBuilder(ZkClient zkClient, PathFilter pathFilter, final int level, final StringBuilder builder,
+            final String startPath) {
         final List<String> children = zkClient.getChildren(startPath);
         for (final String node : children) {
             String nestedPath;
@@ -210,5 +231,9 @@ public class ZkClientUtils {
         } catch (final UnknownHostException e) {
             throw new RuntimeException("unable to retrieve localhost name");
         }
+    }
+    public static void main(String[] args) {
+        System.out.println("hello world");
+        System.out.println(zkVersion);
     }
 }

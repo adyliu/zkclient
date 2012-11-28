@@ -16,6 +16,8 @@
 package com.github.zkclient;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,8 +25,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.Op;
-import org.apache.zookeeper.OpResult;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
@@ -45,6 +45,19 @@ public class ZkConnection{
 
     private final String _servers;
     private final int _sessionTimeOut;
+    
+    private static final Method method;
+    static {
+        Method[] methods = ZooKeeper.class.getDeclaredMethods();
+        Method m = null;
+        for(Method method:methods) {
+            if(method.getName().equals("multi")) {
+                m = method;
+                break;
+            }
+        }
+        method = m;
+    }
 
     public ZkConnection(String zkServers) {
         this(zkServers, DEFAULT_SESSION_TIMEOUT);
@@ -104,9 +117,25 @@ public class ZkConnection{
     public byte[] readData(String path, Stat stat, boolean watch) throws KeeperException, InterruptedException {
         return _zk.getData(path, watch, stat);
     }
-
-    public  List<OpResult> multi(Iterable<Op> ops) throws InterruptedException, KeeperException {
-        return _zk.multi(ops);
+    /**
+     * wrapper for 3.3.x/3.4.x
+     * @param ops
+     * @return OpResult list
+     * @throws InterruptedException
+     * @throws KeeperException
+     */
+    @SuppressWarnings("unchecked")
+    public  List<Object> multi(Iterable<Object> ops) throws InterruptedException, KeeperException {
+        if(method == null) throw new UnsupportedOperationException("multi operation must use zookeeper 3.4+");
+        try {
+            return (List<Object>)method.invoke(_zk, ops);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException("ops must be 'org.apache.zookeeper.Op'");
+        } catch (IllegalAccessException e) {
+            throw new UnsupportedOperationException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     public Stat writeData(String path, byte[] data) throws KeeperException, InterruptedException {
