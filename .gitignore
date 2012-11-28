@@ -6,3 +6,4 @@ build-eclipse
 build
 junit*
 target
+pom-*.xml
