@@ -118,7 +118,7 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return count.get();
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         //
         assertEquals(1,count.get());
         assertEquals(0,children.size());
@@ -131,7 +131,7 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return count.get();
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         //
         assertEquals(1,count.get());
         assertEquals(1,children.size());
@@ -147,7 +147,7 @@ public class ZkClientTest {
             public Boolean call() throws Exception {
                 return count.get()>0&&children.size()==0;
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         assertTrue(eventReceived);
         assertEquals(0,children.size());
         // ===========================================
@@ -161,7 +161,7 @@ public class ZkClientTest {
             public Boolean call() throws Exception {
                 return count.get()>0;
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         assertTrue(eventReceived);
         assertEquals(0,children.size());
         //
@@ -174,7 +174,7 @@ public class ZkClientTest {
             public Boolean call() throws Exception {
                 return count.get()>0;
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         assertTrue(eventReceived);
         assertEquals(1,children.size());
         assertEquals("child",children.get(0));
@@ -188,7 +188,7 @@ public class ZkClientTest {
             public Boolean call() throws Exception {
                 return count.get()>0;
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         assertTrue(eventReceived);
         assertEquals(0,children.size());
     }
@@ -249,7 +249,7 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return countChanged.get();
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         assertEquals(1,countChanged.get());
         assertEquals(0,countDeleted.get());
         assertEquals("aaa",holder.get());
@@ -263,7 +263,7 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return countDeleted.get();
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         assertEquals(0,countChanged.get());
         assertEquals(1,countDeleted.get());
         assertNull(holder.get());
@@ -278,7 +278,7 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return countChanged.get();
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         assertEquals(1,countChanged.get());
         assertEquals("bbb",holder.get());
         //
@@ -290,7 +290,7 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return countChanged.get();
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         assertEquals(1,countChanged.get());
         assertEquals("ccc",holder.get());
     }
@@ -439,7 +439,7 @@ public class ZkClientTest {
                 client.createPersistent(path);
             }
         }.start();
-        assertTrue(client.waitUntilExists(path, TimeUnit.SECONDS, 4));
+        assertTrue(client.waitUntilExists(path, TimeUnit.SECONDS, 10));
         assertTrue(client.exists(path));
         //
         assertFalse(client.waitUntilExists("/notexists", TimeUnit.SECONDS, 1));
@@ -451,7 +451,7 @@ public class ZkClientTest {
      */
     @Test
     public void testWaitUntilConnected() {
-        ZkClient client2 = new ZkClient("localhost:4711",4000);
+        ZkClient client2 = new ZkClient("localhost:4711",15000);
         assertTrue(client2.waitUntilConnected());
         server.shutdown();
         //
@@ -575,7 +575,7 @@ public class ZkClientTest {
             public Boolean call() throws Exception {
                 return children.get()!=null&&children.get().size()==1;
             }
-        }, TimeUnit.SECONDS, 5);
+        }, TimeUnit.SECONDS, 15);
         //
         assertTrue(hasOneChild);
         assertEquals("node1",children.get().get(0));
