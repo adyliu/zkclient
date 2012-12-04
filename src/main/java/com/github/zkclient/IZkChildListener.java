@@ -30,12 +30,14 @@ public interface IZkChildListener {
 
     /**
      * Called when the children of the given path changed.
-     * 
+     * <p>
+     * NOTICE: if subscribing a node(not exists), the event will be triggered while the node(parent) were created.
+     * </p>
      * @param parentPath
      *            The parent path
-     * @param currentChilds
+     * @param currentChildren
      *            The children or null if the root node (parent path) was deleted.
      * @throws Exception
      */
-    public void handleChildChange(String parentPath, List<String> currentChilds) throws Exception;
+    public void handleChildChange(String parentPath, List<String> currentChildren) throws Exception;
 }

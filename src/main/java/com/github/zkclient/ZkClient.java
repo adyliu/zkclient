@@ -24,17 +24,18 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.KeeperException.ConnectionLossException;
 import org.apache.zookeeper.KeeperException.SessionExpiredException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
+import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooKeeper.States;
 import org.apache.zookeeper.data.Stat;
 
@@ -47,8 +48,7 @@ import com.github.zkclient.exception.ZkNodeExistsException;
 import com.github.zkclient.exception.ZkTimeoutException;
 
 /**
- * Abstracts the interaction with zookeeper and allows permanent (not just one time) watches on
- * nodes in ZooKeeper
+ * Zookeeper client
  */
 public class ZkClient implements Watcher, IZkClient {
 
@@ -75,16 +75,29 @@ public class ZkClient implements Watcher, IZkClient {
     public ZkClient(String zkServers) {
         this(zkServers,DEFAULT_CONNECTION_TIMEOUT);
     }
-
+    /**
+     * 
+     * @param zkServers zookeeper connection string
+     * @param connectionTimeout connection timeout in milliseconds
+     */
     public ZkClient(String zkServers, int connectionTimeout) {
         this(zkServers, DEFAULT_SESSION_TIMEOUT,connectionTimeout);
     }
 
-    
+    /**
+     * 
+     * @param zkServers zookeeper connection string
+     * @param sessionTimeout session timeout in milliseconds
+     * @param connectionTimeout connection timeout in milliseconds
+     */
     public ZkClient(String zkServers, int sessionTimeout, int connectionTimeout) {
         this(new ZkConnection(zkServers, sessionTimeout), connectionTimeout);
     }
-
+    /**
+     * 
+     * @param zkConnection
+     * @param connectionTimeout connection timeout in milliseconds
+     */
     public ZkClient(ZkConnection zkConnection, int connectionTimeout) {
         _connection = zkConnection;
         connect(connectionTimeout, this);
@@ -509,8 +522,8 @@ public class ZkClient implements Watcher, IZkClient {
         return _dataListener.get(path);
     }
 
-    public void waitUntilConnected() throws ZkInterruptedException {
-        waitUntilConnected(Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
+    public boolean waitUntilConnected() throws ZkInterruptedException {
+        return waitUntilConnected(Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
     }
 
     public boolean waitUntilConnected(long time, TimeUnit timeUnit) throws ZkInterruptedException {
@@ -733,7 +746,7 @@ public class ZkClient implements Watcher, IZkClient {
             _eventThread.start();
             _connection.connect(watcher);
 
-            LOG.debug("Awaiting connection to Zookeeper server");
+            LOG.debug("Awaiting connection to Zookeeper server: "+maxMsToWaitUntilConnected);
             if (!waitUntilConnected(maxMsToWaitUntilConnected, TimeUnit.MILLISECONDS)) {
                 throw new ZkTimeoutException(
                         "Unable to connect to zookeeper server within timeout: " + maxMsToWaitUntilConnected);

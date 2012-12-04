@@ -31,7 +31,7 @@ public class ServerCnxnFactory {
         try {
             startupMethod.invoke(target, server);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
+            throw e;
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -88,9 +88,9 @@ public class ServerCnxnFactory {
         try {
             shutdownMethod.invoke(target, new Object[0]);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            throw e;
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
             throw new RuntimeException(t);
@@ -101,7 +101,7 @@ public class ServerCnxnFactory {
         try {
             joinMethod.invoke(target, new Object[0]);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
+            throw e;
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {

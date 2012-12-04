@@ -250,7 +250,7 @@ public interface IZkClient extends Closeable{
 
     boolean waitForKeeperState(KeeperState keeperState, long time, TimeUnit timeUnit);
 
-    void waitUntilConnected() throws ZkInterruptedException;
+    boolean waitUntilConnected() throws ZkInterruptedException;
 
     boolean waitUntilConnected(long time, TimeUnit timeUnit);
 

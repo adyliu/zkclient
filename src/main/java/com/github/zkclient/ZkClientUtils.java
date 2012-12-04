@@ -86,118 +86,8 @@ public class ZkClientUtils {
         return String.format("%0" + numberOfLeadingZeros + "d", number);
     }
 
-    public static String toString(ZkClient zkClient) {
-        return toString(zkClient, "/", PathFilter.ALL);
-    }
-
-    public static String toString(ZkClient zkClient, String startPath, PathFilter pathFilter) {
-        final int level = 1;
-        final StringBuilder builder = new StringBuilder("+ (" + startPath + ")");
-        builder.append("\n");
-        addChildrenToStringBuilder(zkClient, pathFilter, level, builder, startPath);
-        return builder.toString();
-    }
-
-    private static void addChildrenToStringBuilder(ZkClient zkClient, PathFilter pathFilter, final int level, final StringBuilder builder,
-            final String startPath) {
-        final List<String> children = zkClient.getChildren(startPath);
-        for (final String node : children) {
-            String nestedPath;
-            if (startPath.endsWith("/")) {
-                nestedPath = startPath + node;
-            } else {
-                nestedPath = startPath + "/" + node;
-            }
-            if (pathFilter.showChilds(nestedPath)) {
-                builder.append(getSpaces(level - 1) + "'-" + "+" + node + "\n");
-                addChildrenToStringBuilder(zkClient, pathFilter, level + 1, builder, nestedPath);
-            } else {
-                builder.append(getSpaces(level - 1) + "'-" + "-" + node + " (contents hidden)\n");
-            }
-        }
-    }
-
-    private static String getSpaces(final int level) {
-        String s = "";
-        for (int i = 0; i < level; i++) {
-            s += "  ";
-        }
-        return s;
-    }
-
-    public static interface PathFilter {
-
-        public static PathFilter ALL = new PathFilter() {
-
-            @Override
-            public boolean showChilds(String path) {
-                return true;
-            }
-        };
-
-        boolean showChilds(String path);
-    }
-
     public final static String OVERWRITE_HOSTNAME_SYSTEM_PROPERTY = "zkclient.hostname.overwritten";
 
-    public static String[] getLocalHostNames() {
-        final Set<String> hostNames = new HashSet<String>();
-        // we add localhost to this set manually, because if the ip 127.0.0.1 is
-        // configured with more than one name in the /etc/hosts, only the first
-        // name
-        // is returned
-        hostNames.add("localhost");
-        try {
-            final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            for (final Enumeration<NetworkInterface> ifaces = networkInterfaces; ifaces.hasMoreElements();) {
-                final NetworkInterface iface = ifaces.nextElement();
-                InetAddress ia = null;
-                for (final Enumeration<InetAddress> ips = iface.getInetAddresses(); ips.hasMoreElements();) {
-                    ia = ips.nextElement();
-                    hostNames.add(ia.getCanonicalHostName());
-                    hostNames.add(ipToString(ia.getAddress()));
-                }
-            }
-        } catch (final SocketException e) {
-            throw new RuntimeException("unable to retrieve host names of localhost");
-        }
-        return hostNames.toArray(new String[hostNames.size()]);
-    }
-
-    private static String ipToString(final byte[] bytes) {
-        final StringBuffer addrStr = new StringBuffer();
-        for (int cnt = 0; cnt < bytes.length; cnt++) {
-            final int uByte = bytes[cnt] < 0 ? bytes[cnt] + 256 : bytes[cnt];
-            addrStr.append(uByte);
-            if (cnt < 3)
-                addrStr.append('.');
-        }
-        return addrStr.toString();
-    }
-
-    public static int hostNamesInList(final String serverList, final String[] hostNames) {
-        final String[] serverNames = serverList.split(",");
-        for (int i = 0; i < hostNames.length; i++) {
-            final String hostname = hostNames[i];
-            for (int j = 0; j < serverNames.length; j++) {
-                final String serverNameAndPort = serverNames[j];
-                final String serverName = serverNameAndPort.split(":")[0];
-                if (serverName.equalsIgnoreCase(hostname)) {
-                    return j;
-                }
-            }
-        }
-        return -1;
-    }
-
-    public static boolean hostNameInArray(final String[] hostNames, final String hostName) {
-        for (final String name : hostNames) {
-            if (name.equalsIgnoreCase(hostName)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static boolean isPortFree(int port) {
         try {
@@ -231,9 +121,5 @@ public class ZkClientUtils {
         } catch (final UnknownHostException e) {
             throw new RuntimeException("unable to retrieve localhost name");
         }
-    }
-    public static void main(String[] args) {
-        System.out.println("hello world");
-        System.out.println(zkVersion);
     }
 }

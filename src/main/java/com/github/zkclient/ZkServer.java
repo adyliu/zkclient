@@ -42,7 +42,6 @@ public class ZkServer {
 
     private String _logDir;
 
-
     private ZooKeeperServer _zk;
 
     private ServerCnxnFactory _nioFactory;
@@ -81,54 +80,25 @@ public class ZkServer {
 
     @PostConstruct
     public void start() {
-        final String[] localHostNames = ZkClientUtils.getLocalHostNames();
-        String names = "";
-        for (int i = 0; i < localHostNames.length; i++) {
-            final String name = localHostNames[i];
-            names += " " + name;
-            if (i + 1 != localHostNames.length) {
-                names += ",";
-            }
-        }
-        LOG.info("Starting ZkServer on: [" + names + "] port " + _port + "...");
         startZooKeeperServer();
         _zkClient = new ZkClient("localhost:" + _port, 10000);
     }
 
     private void startZooKeeperServer() {
-        final String[] localhostHostNames = ZkClientUtils.getLocalHostNames();
-        final String servers = "localhost:" + _port;
-        // check if this server needs to start a _client server.
-        int pos = -1;
-        LOG.debug("check if hostNames " + servers + " is in list: " + Arrays.asList(localhostHostNames));
-        if ((pos = ZkClientUtils.hostNamesInList(servers, localhostHostNames)) != -1) {
-            // yes this server needs to start a zookeeper server
-            final String[] hosts = servers.split(",");
-            final String[] hostSplitted = hosts[pos].split(":");
-            int port = _port;
-            if (hostSplitted.length > 1) {
-                port = Integer.parseInt(hostSplitted[1]);
-            }
-            // check if this machine is already something running..
-            if (ZkClientUtils.isPortFree(port)) {
-                final File dataDir = new File(_dataDir);
-                final File dataLogDir = new File(_logDir);
-                dataDir.mkdirs();
-                dataLogDir.mkdirs();
+        final int port = _port;
+        if (ZkClientUtils.isPortFree(port)) {
+            final File dataDir = new File(_dataDir);
+            final File dataLogDir = new File(_logDir);
+            dataDir.mkdirs();
+            dataLogDir.mkdirs();
 
-                if (hosts.length > 1) {
-                    // multiple zk servers
-                    LOG.info("Start distributed zookeeper server...");
-                    throw new IllegalArgumentException("Unable to start distributed zookeeper server");
-                }
-                // single zk server
-                LOG.info("Start single zookeeper server...");
-                LOG.info("data dir: " + dataDir.getAbsolutePath());
-                LOG.info("data log dir: " + dataLogDir.getAbsolutePath());
-                startSingleZkServer(_tickTime, dataDir, dataLogDir, port);
-            } else {
-                throw new IllegalStateException("Zookeeper port " + port + " was already in use. Running in single machine mode?");
-            }
+            // single zk server
+            LOG.info("Start single zookeeper server...");
+            LOG.info("data dir: " + dataDir.getAbsolutePath());
+            LOG.info("data log dir: " + dataLogDir.getAbsolutePath());
+            startSingleZkServer(_tickTime, dataDir, dataLogDir, port);
+        } else {
+            throw new IllegalStateException("Zookeeper port " + port + " was already in use. Running in single machine mode?");
         }
     }
 
@@ -136,7 +106,7 @@ public class ZkServer {
         try {
             _zk = new ZooKeeperServer(dataDir, dataLogDir, tickTime);
             _zk.setMinSessionTimeout(_minSessionTimeout);
-            _nioFactory =ServerCnxnFactory.createFactory(port,60);
+            _nioFactory = ServerCnxnFactory.createFactory(port, 60);
             _nioFactory.startup(_zk);
         } catch (IOException e) {
             throw new ZkException("Unable to start single ZooKeeper server.", e);
@@ -147,6 +117,10 @@ public class ZkServer {
 
     @PreDestroy
     public void shutdown() {
+        if(_zk == null) {
+            LOG.warn("shutdown duplication");
+            return;
+        }
         LOG.info("Shutting down ZkServer...");
         try {
             _zkClient.close();
@@ -166,7 +140,7 @@ public class ZkServer {
             _zk.shutdown();
             if (_zk.getZKDatabase() != null) {
                 try {
-                    //release file description
+                    // release file description
                     _zk.getZKDatabase().close();
                 } catch (IOException e) {
                     LOG.error(e.getMessage(), e);

@@ -62,7 +62,11 @@ public class ZkConnection{
     public ZkConnection(String zkServers) {
         this(zkServers, DEFAULT_SESSION_TIMEOUT);
     }
-
+    /**
+     * 
+     * @param zkServers zookeeper connection string
+     * @param sessionTimeOut session timeout in milliseconds
+     */
     public ZkConnection(String zkServers, int sessionTimeOut) {
         _servers = zkServers;
         _sessionTimeOut = sessionTimeOut;
