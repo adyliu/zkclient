@@ -7,3 +7,5 @@ build
 junit*
 target
 pom-*.xml
+.idea/
+*.iml

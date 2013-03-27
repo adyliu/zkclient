@@ -33,11 +33,13 @@ import org.apache.zookeeper.data.Stat;
 
 import com.github.zkclient.exception.ZkException;
 
-public class ZkConnection{
+public class ZkConnection {
 
     private static final Logger LOG = Logger.getLogger(ZkConnection.class);
 
-    /** It is recommended to use quite large sessions timeouts for ZooKeeper. */
+    /**
+     * It is recommended to use quite large sessions timeouts for ZooKeeper.
+     */
     private static final int DEFAULT_SESSION_TIMEOUT = 30000;
 
     private ZooKeeper _zk = null;
@@ -45,13 +47,14 @@ public class ZkConnection{
 
     private final String _servers;
     private final int _sessionTimeOut;
-    
+
     private static final Method method;
+
     static {
         Method[] methods = ZooKeeper.class.getDeclaredMethods();
         Method m = null;
-        for(Method method:methods) {
-            if(method.getName().equals("multi")) {
+        for (Method method : methods) {
+            if (method.getName().equals("multi")) {
                 m = method;
                 break;
             }
@@ -62,9 +65,9 @@ public class ZkConnection{
     public ZkConnection(String zkServers) {
         this(zkServers, DEFAULT_SESSION_TIMEOUT);
     }
+
     /**
-     * 
-     * @param zkServers zookeeper connection string
+     * @param zkServers      zookeeper connection string
      * @param sessionTimeOut session timeout in milliseconds
      */
     public ZkConnection(String zkServers, int sessionTimeOut) {
@@ -121,18 +124,20 @@ public class ZkConnection{
     public byte[] readData(String path, Stat stat, boolean watch) throws KeeperException, InterruptedException {
         return _zk.getData(path, watch, stat);
     }
+
     /**
      * wrapper for 3.3.x/3.4.x
+     *
      * @param ops
      * @return OpResult list
      * @throws InterruptedException
      * @throws KeeperException
      */
     @SuppressWarnings("unchecked")
-    public  List<Object> multi(Iterable<Object> ops) throws InterruptedException, KeeperException {
-        if(method == null) throw new UnsupportedOperationException("multi operation must use zookeeper 3.4+");
+    public List<Object> multi(Iterable<Object> ops) throws InterruptedException, KeeperException {
+        if (method == null) throw new UnsupportedOperationException("multi operation must use zookeeper 3.4+");
         try {
-            return (List<Object>)method.invoke(_zk, ops);
+            return (List<Object>) method.invoke(_zk, ops);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedOperationException("ops must be 'org.apache.zookeeper.Op'");
         } catch (IllegalAccessException e) {
@@ -141,7 +146,7 @@ public class ZkConnection{
             throw new RuntimeException(e);
         }
     }
-    
+
     public Stat writeData(String path, byte[] data) throws KeeperException, InterruptedException {
         return writeData(path, data, -1);
     }
@@ -169,7 +174,7 @@ public class ZkConnection{
     public String getServers() {
         return _servers;
     }
-    
+
     public ZooKeeper getZooKeeper() {
         return _zk;
     }

@@ -38,6 +38,7 @@ public class ZkClientUtils {
     }
 
     public static final ZkVersion zkVersion;
+
     static {
         ZkVersion version = null;
         try {
@@ -63,9 +64,8 @@ public class ZkClientUtils {
      * This sets the interrupt flag if the catched exception was an
      * {@link InterruptedException}. Catching such an exception always clears
      * the interrupt flag.
-     * 
-     * @param catchedException
-     *            The catched exception.
+     *
+     * @param catchedException The catched exception.
      */
     public static void retainInterruptFlag(Throwable catchedException) {
         if (catchedException instanceof InterruptedException) {

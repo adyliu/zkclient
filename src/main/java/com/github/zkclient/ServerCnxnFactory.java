@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.zkclient;
 
@@ -13,7 +13,7 @@ import com.github.zkclient.ZkClientUtils.ZkVersion;
 
 /**
  * Adapter for zookeeper 3.3.x/3.4.x
- * 
+ *
  * @author adyliu(imxylz@gmail.com)
  * @since 2012-11-27
  */
@@ -62,19 +62,19 @@ public class ServerCnxnFactory {
             }
 
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("unsupported zookeeper version",e);
+            throw new RuntimeException("unsupported zookeeper version", e);
         } catch (SecurityException e) {
-            throw new RuntimeException(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage(), e);
         } catch (InstantiationException e) {
-            throw new RuntimeException(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage(), e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage(), e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage(), e);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException("unsupported zookeeper version",e);
+            throw new RuntimeException("unsupported zookeeper version", e);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("unsupported zookeeper version",e);
+            throw new RuntimeException("unsupported zookeeper version", e);
         }
 
         return factory;
@@ -112,6 +112,7 @@ public class ServerCnxnFactory {
             throw new RuntimeException(t);
         }
     }
+
     public static void main(String[] args) throws Exception {
         ServerCnxnFactory factory = ServerCnxnFactory.createFactory(8123, 60);
         factory.shutdown();

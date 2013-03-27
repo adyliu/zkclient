@@ -28,7 +28,7 @@ public class ZkLock extends ReentrantLock {
 
     /**
      * This condition will be signaled if a zookeeper event was processed and the event contains a data/child change.
-     * 
+     *
      * @return the condition.
      */
     public Condition getDataChangedCondition() {
@@ -38,7 +38,7 @@ public class ZkLock extends ReentrantLock {
     /**
      * This condition will be signaled if a zookeeper event was processed and the event contains a state change
      * (connected, disconnected, session expired, etc ...).
-     * 
+     *
      * @return the condition.
      */
     public Condition getStateChangedCondition() {
@@ -47,7 +47,7 @@ public class ZkLock extends ReentrantLock {
 
     /**
      * This condition will be signaled if any znode related zookeeper event was received.
-     * 
+     *
      * @return the condition.
      */
     public Condition getZNodeEventCondition() {

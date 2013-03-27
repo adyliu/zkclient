@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.zkclient;
 
@@ -8,7 +8,6 @@ import java.util.List;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 
 /**
- * 
  * @author adyliu(imxylz@gmail.com)
  * @since 2012-12-4
  */

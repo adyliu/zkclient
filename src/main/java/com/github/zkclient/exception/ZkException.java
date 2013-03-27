@@ -39,20 +39,20 @@ public class ZkException extends RuntimeException {
 
     public static ZkException create(KeeperException e) {
         switch (e.code()) {
-        // case DATAINCONSISTENCY:
-        // return new DataInconsistencyException();
-        // case CONNECTIONLOSS:
-        // return new ConnectionLossException();
-        case NONODE:
-            return new ZkNoNodeException(e);
+            // case DATAINCONSISTENCY:
+            // return new DataInconsistencyException();
+            // case CONNECTIONLOSS:
+            // return new ConnectionLossException();
+            case NONODE:
+                return new ZkNoNodeException(e);
             // case NOAUTH:
             // return new ZkNoAuthException();
-        case BADVERSION:
-            return new ZkBadVersionException(e);
+            case BADVERSION:
+                return new ZkBadVersionException(e);
             // case NOCHILDRENFOREPHEMERALS:
             // return new NoChildrenForEphemeralsException();
-        case NODEEXISTS:
-            return new ZkNodeExistsException(e);
+            case NODEEXISTS:
+                return new ZkNodeExistsException(e);
             // case INVALIDACL:
             // return new ZkInvalidACLException();
             // case AUTHFAILED:
@@ -64,8 +64,8 @@ public class ZkException extends RuntimeException {
             // case INVALIDCALLBACK:
             // return new InvalidCallbackException();
 
-        default:
-            return new ZkException(e);
+            default:
+                return new ZkException(e);
         }
     }
 }

@@ -117,7 +117,7 @@ public class ZkServer {
 
     @PreDestroy
     public void shutdown() {
-        if(_zk == null) {
+        if (_zk == null) {
             LOG.warn("shutdown duplication");
             return;
         }
