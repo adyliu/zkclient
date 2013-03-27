@@ -8,8 +8,12 @@ import java.util.List;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 
 /**
+ * An abstract class for zookeeper listner
  * @author adyliu(imxylz@gmail.com)
  * @since 2012-12-4
+ * @see IZkChildListener
+ * @see IZkDataListener
+ * @see IZkStateListener
  */
 public abstract class AbstractListener implements IZkChildListener, IZkDataListener, IZkStateListener {
 
