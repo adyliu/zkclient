@@ -86,8 +86,9 @@ public class ZkClientTest {
 
     @After
     public void tearDown() throws Exception {
-        if (this.server != null)
+        if (this.server != null){
             this.server.shutdown();
+        }
     }
 
     /**
@@ -97,7 +98,7 @@ public class ZkClientTest {
      */
     @Test
     public void testSubscribeChildChanges() throws Exception{
-        String path = "/a";
+        final String path = "/a";
         final AtomicInteger count = new AtomicInteger(0);
         final ArrayList<String> children = new ArrayList<String>();
         IZkChildListener listener = new IZkChildListener() {
@@ -106,11 +107,13 @@ public class ZkClientTest {
                 children.clear();
                 if(currentChildren!=null)
                 children.addAll(currentChildren);
+                logger.info("handle childchange "+parentPath+", "+currentChildren);
             }
         };
         //
         client.subscribeChildChanges(path, listener);
         //
+        logger.info("create the watcher node "+path);
         client.createPersistent(path);
         //wait some time to make sure the event was triggered
         TestUtil.waitUntil(1, new Callable<Integer>() {
@@ -126,6 +129,7 @@ public class ZkClientTest {
         //create a child node
         count.set(0);
         client.createPersistent(path+"/child1");
+        logger.info("create the first child node "+path+"/child1");
         TestUtil.waitUntil(1, new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
@@ -139,7 +143,10 @@ public class ZkClientTest {
         //
         // create another child node and delete the node
         count.set(0);
+        logger.info("create the second child node "+path+"/child2");
         client.createPersistent(path+"/child2");
+        //
+        logger.info("delete the watcher node "+path);
         client.deleteRecursive(path);
         //
         Boolean eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
@@ -154,6 +161,8 @@ public class ZkClientTest {
         // do it again and check the listener validate
         // ===========================================
         count.set(0);
+        //
+        logger.info("create the watcher node again "+path);
         client.createPersistent(path);
         //
         eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
@@ -168,6 +177,7 @@ public class ZkClientTest {
         // now create the first node
         count.set(0);
         client.createPersistent(path+"/child");
+        logger.info("create the first child node again "+path+"/child1");
         //
         eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
             @Override
@@ -181,6 +191,7 @@ public class ZkClientTest {
         //
         // delete root node 
         count.set(0);
+        logger.info("delete the watcher node again "+path);
         client.deleteRecursive(path);
         //
         eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
