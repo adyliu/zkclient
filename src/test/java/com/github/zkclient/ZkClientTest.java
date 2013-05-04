@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 
 /**
  * 
- * @author adyliu(imxylz@gmail.com)
+ * @author adyliu (imxylz@gmail.com)
  * @since 2012-12-3
  */
 public class ZkClientTest {
@@ -46,14 +46,18 @@ public class ZkClientTest {
     private ZkServer server;
     private ZkClient client;
 
+
     //
     private static void deleteFile(File f) throws IOException {
         if (f.isFile()) {
             f.delete();
             //System.out.println("[DELETE FILE] "+f.getPath());
         } else if (f.isDirectory()) {
-            for (File fs : f.listFiles()) {
-                deleteFile(fs);
+            File[] files = f.listFiles();
+            if (files != null) {
+                for (File fs : files) {
+                    deleteFile(fs);
+                }
             }
             f.delete();
             //System.out.println("[DELETE DIRECTORY] "+f.getPath());
@@ -528,10 +532,12 @@ public class ZkClientTest {
     @Test
     public void testRetryUnitConnected_SessionExpiredException() {
         int sessionTimeout = 200;
-        Gateway gateway = new Gateway(4712,4711);
+        int port = PortUtils.checkAvailablePort(4712);
+        int dport = this.server.getPort();
+        Gateway gateway = new Gateway(port,dport);
         gateway.start();
         //
-        final ZkClient client2 = new ZkClient("localhost:4712",sessionTimeout,15000);
+        final ZkClient client2 = new ZkClient("localhost:"+port,sessionTimeout,15000);
         gateway.stop();
         //
         //start the server after 600ms
@@ -558,10 +564,12 @@ public class ZkClientTest {
         ZkClient connectedClient = server.getZkClient();
         connectedClient.createPersistent("/root");
         //
-        Gateway gateway = new Gateway(4712,4711);
+        int port = PortUtils.checkAvailablePort(4712);
+        int dport = this.server.getPort();
+        Gateway gateway = new Gateway(port,dport);
         gateway.start();
         //
-        final ZkClient disconnectedClient = new ZkClient("localhost:"+4712,sessionTimeout,15000);
+        final ZkClient disconnectedClient = new ZkClient("localhost:"+port,sessionTimeout,15000);
         final Holder<List<String>> children = new Holder<List<String>>();
         disconnectedClient.subscribeChildChanges("/root", new IZkChildListener() {
             

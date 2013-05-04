@@ -14,13 +14,13 @@ import com.github.zkclient.ZkClientUtils.ZkVersion;
 /**
  * Adapter for zookeeper 3.3.x/3.4.x
  *
- * @author adyliu(imxylz@gmail.com)
+ * @author adyliu (imxylz@gmail.com)
  * @since 2012-11-27
  */
 public class ServerCnxnFactory {
 
-    public static final String zk33Factory = "org.apache.zookeeper.server.NIOServerCnxn$Factory";
-    public static final String zk34Factory = "org.apache.zookeeper.server.ServerCnxnFactory";
+    private static final String zk33Factory = "org.apache.zookeeper.server.NIOServerCnxn$Factory";
+    private static final String zk34Factory = "org.apache.zookeeper.server.ServerCnxnFactory";
 
     private Object target = null;
     private Method shutdownMethod = null;
@@ -43,7 +43,7 @@ public class ServerCnxnFactory {
         }
     }
 
-    public static ServerCnxnFactory createFactory(final String hostname, int port, int maxcc) {
+    private static ServerCnxnFactory createFactory(final String hostname, int port, int maxcc) {
         ServerCnxnFactory factory = new ServerCnxnFactory();
 
         try {

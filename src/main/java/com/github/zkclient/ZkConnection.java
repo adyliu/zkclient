@@ -43,7 +43,7 @@ public class ZkConnection {
     private static final int DEFAULT_SESSION_TIMEOUT = 30000;
 
     private ZooKeeper _zk = null;
-    private Lock _zookeeperLock = new ReentrantLock();
+    private final Lock _zookeeperLock = new ReentrantLock();
 
     private final String _servers;
     private final int _sessionTimeOut;
@@ -128,13 +128,11 @@ public class ZkConnection {
     /**
      * wrapper for 3.3.x/3.4.x
      *
-     * @param ops
+     * @param ops multi operations
      * @return OpResult list
-     * @throws InterruptedException
-     * @throws KeeperException
      */
     @SuppressWarnings("unchecked")
-    public List<Object> multi(Iterable<Object> ops) throws InterruptedException, KeeperException {
+    public List<Object> multi(Iterable<Object> ops) {
         if (method == null) throw new UnsupportedOperationException("multi operation must use zookeeper 3.4+");
         try {
             return (List<Object>) method.invoke(_zk, ops);

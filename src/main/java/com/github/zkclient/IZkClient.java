@@ -78,15 +78,12 @@ public interface IZkClient extends Closeable {
      * @param data node data
      * @param mode create mode {@link CreateMode}
      * @return created path
-     * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
-     *                                  got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
-    String create(final String path, byte[] data, final CreateMode mode) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException;
+    String create(final String path, byte[] data, final CreateMode mode) throws
+            IllegalArgumentException, ZkException;
 
     /**
      * Create an ephemeral node with empty data
@@ -97,30 +94,27 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
-    void createEphemeral(final String path) throws ZkInterruptedException, IllegalArgumentException, ZkException,
-            RuntimeException;
+    void createEphemeral(final String path) throws ZkInterruptedException, IllegalArgumentException, ZkException;
 
     /**
      * Create an ephemeral node.
      *
-     * @param path zk path
+     * @param path the path for the node
      * @param data node data
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
     void createEphemeral(final String path, final byte[] data) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException;
+            ZkException;
 
     /**
      * Create an ephemeral, sequential node.
      *
-     * @param path
+     * @param path the path for the node
      * @param data
      * @return created path
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
@@ -128,10 +122,9 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
     String createEphemeralSequential(final String path, final byte[] data) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException;
+            IllegalArgumentException, ZkException;
 
     /**
      * Create a persistent node with empty data
@@ -142,15 +135,13 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
-    void createPersistent(String path) throws ZkInterruptedException, IllegalArgumentException, ZkException,
-            RuntimeException;
+    void createPersistent(String path) throws ZkInterruptedException, IllegalArgumentException, ZkException;
 
     /**
      * Create a persistent node.
      *
-     * @param path          zk path
+     * @param path the path for the node
      * @param createParents if true all parent dirs are created as well and no
      *                      {@link ZkNodeExistsException} is thrown in case the path already exists
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
@@ -158,30 +149,27 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
     void createPersistent(String path, boolean createParents) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException;
+            ZkException;
 
     /**
      * Create a persistent node.
      *
-     * @param path zk path
+     * @param path the path for the node
      * @param data node data
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
-    void createPersistent(String path, byte[] data) throws ZkInterruptedException, IllegalArgumentException, ZkException,
-            RuntimeException;
+    void createPersistent(String path, byte[] data) throws ZkInterruptedException, IllegalArgumentException, ZkException;
 
     /**
      * Create a persistent, sequental node.
      *
-     * @param path zk path
+     * @param path the path for the node
      * @param data node data
      * @return create node's path
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
@@ -189,15 +177,14 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
     String createPersistentSequential(String path, byte[] data) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException;
+            ZkException;
 
     /**
      * delete a node
      *
-     * @param path zk path
+     * @param path the path for the node
      * @return true if deleted; otherwise false
      */
     boolean delete(final String path);
@@ -205,7 +192,7 @@ public interface IZkClient extends Closeable {
     /**
      * delete a node with all children
      *
-     * @param path zk path
+     * @param path the path for the node
      * @return true if all deleted; otherwise false
      */
     boolean deleteRecursive(String path);
@@ -251,7 +238,7 @@ public interface IZkClient extends Closeable {
      * the updater once again until the new contents can be successfully written back to
      * ZooKeeper.
      *
-     * @param path    The path of the znode.
+     * @param path the path for the node
      * @param updater Updater that creates the new contents.
      */
     void cas(String path, DataUpdater<byte[]> updater);

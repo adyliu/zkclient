@@ -24,7 +24,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
@@ -49,6 +48,9 @@ import com.github.zkclient.exception.ZkTimeoutException;
 
 /**
  * Zookeeper client
+ * <p>
+ * The client is thread-safety
+ * </p>
  */
 public class ZkClient implements Watcher, IZkClient {
 
@@ -72,29 +74,66 @@ public class ZkClient implements Watcher, IZkClient {
 
     private Thread _zookeeperEventThread;
 
-    public ZkClient(String zkServers) {
-        this(zkServers, DEFAULT_CONNECTION_TIMEOUT);
+    /**
+     * Create a client with default connection timeout and default session timeout
+     *
+     * @param connectString zookeeper connection string
+     *                      comma separated host:port pairs, each corresponding to a zk
+     *                      server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002" If
+     *                      the optional chroot suffix is used the example would look
+     *                      like: "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002/app/a"
+     *                      where the client would be rooted at "/app/a" and all paths
+     *                      would be relative to this root - ie getting/setting/etc...
+     *                      "/foo/bar" would result in operations being run on
+     *                      "/app/a/foo/bar" (from the server perspective).
+     * @see IZkClient#DEFAULT_CONNECTION_TIMEOUT
+     * @see IZkClient#DEFAULT_SESSION_TIMEOUT
+     */
+    public ZkClient(String connectString) {
+        this(connectString, DEFAULT_CONNECTION_TIMEOUT);
     }
 
     /**
-     * @param zkServers         zookeeper connection string
+     * Create a client
+     *
+     * @param connectString     zookeeper connection string
+     *                          comma separated host:port pairs, each corresponding to a zk
+     *                          server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002" If
+     *                          the optional chroot suffix is used the example would look
+     *                          like: "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002/app/a"
+     *                          where the client would be rooted at "/app/a" and all paths
+     *                          would be relative to this root - ie getting/setting/etc...
+     *                          "/foo/bar" would result in operations being run on
+     *                          "/app/a/foo/bar" (from the server perspective).
      * @param connectionTimeout connection timeout in milliseconds
      */
-    public ZkClient(String zkServers, int connectionTimeout) {
-        this(zkServers, DEFAULT_SESSION_TIMEOUT, connectionTimeout);
+    public ZkClient(String connectString, int connectionTimeout) {
+        this(connectString, DEFAULT_SESSION_TIMEOUT, connectionTimeout);
     }
 
     /**
-     * @param zkServers         zookeeper connection string
+     * Create a client
+     *
+     * @param connectString     zookeeper connection string
+     *                          comma separated host:port pairs, each corresponding to a zk
+     *                          server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002" If
+     *                          the optional chroot suffix is used the example would look
+     *                          like: "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002/app/a"
+     *                          where the client would be rooted at "/app/a" and all paths
+     *                          would be relative to this root - ie getting/setting/etc...
+     *                          "/foo/bar" would result in operations being run on
+     *                          "/app/a/foo/bar" (from the server perspective).
      * @param sessionTimeout    session timeout in milliseconds
      * @param connectionTimeout connection timeout in milliseconds
      */
-    public ZkClient(String zkServers, int sessionTimeout, int connectionTimeout) {
-        this(new ZkConnection(zkServers, sessionTimeout), connectionTimeout);
+    public ZkClient(String connectString, int sessionTimeout, int connectionTimeout) {
+        this(new ZkConnection(connectString, sessionTimeout), connectionTimeout);
     }
 
     /**
-     * @param zkConnection
+     * Create a client with special implementation
+     *
+     * @param zkConnection      special client
      * @param connectionTimeout connection timeout in milliseconds
      */
     public ZkClient(ZkConnection zkConnection, int connectionTimeout) {
@@ -182,7 +221,7 @@ public class ZkClient implements Watcher, IZkClient {
 
 
     public void createPersistent(String path, boolean createParents) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException {
+            IllegalArgumentException, ZkException {
         try {
             create(path, null, CreateMode.PERSISTENT);
         } catch (ZkNodeExistsException e) {
@@ -213,7 +252,7 @@ public class ZkClient implements Watcher, IZkClient {
 
 
     public void createEphemeral(final String path) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException {
+            ZkException {
         create(path, null, CreateMode.EPHEMERAL);
     }
 
@@ -236,7 +275,7 @@ public class ZkClient implements Watcher, IZkClient {
     /**
      * Create an ephemeral node.
      *
-     * @param path
+     * @param path the path for the node
      * @param data
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
@@ -253,18 +292,17 @@ public class ZkClient implements Watcher, IZkClient {
     /**
      * Create an ephemeral, sequential node.
      *
-     * @param path
-     * @param data
+     * @param path the path for the node
+     * @param data the initial data for the node
      * @return created path
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
     public String createEphemeralSequential(final String path, final byte[] data) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException {
+            IllegalArgumentException, ZkException {
         return create(path, data, CreateMode.EPHEMERAL_SEQUENTIAL);
     }
 
@@ -517,10 +555,6 @@ public class ZkClient implements Watcher, IZkClient {
         }
     }
 
-    protected Set<IZkDataListener> getDataListener(String path) {
-        return _dataListener.get(path);
-    }
-
     public boolean waitUntilConnected() throws ZkInterruptedException {
         return waitUntilConnected(Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
     }
@@ -626,7 +660,7 @@ public class ZkClient implements Watcher, IZkClient {
                 @Override
                 public byte[] call() throws Exception {
                     _connection.delete(path);
-                    return (byte[]) null;
+                    return null;
                 }
             });
 
@@ -653,7 +687,7 @@ public class ZkClient implements Watcher, IZkClient {
     }
 
     public byte[] readData(String path, Stat stat) {
-        return (byte[]) readData(path, stat, hasListeners(path));
+        return readData(path, stat, hasListeners(path));
     }
 
     protected byte[] readData(final String path, final Stat stat, final boolean watch) {
@@ -677,7 +711,7 @@ public class ZkClient implements Watcher, IZkClient {
         do {
             retry = false;
             try {
-                byte[] oldData = (byte[]) readData(path, stat);
+                byte[] oldData = readData(path, stat);
                 byte[] newData = updater.update(oldData);
                 writeData(path, newData, stat.getVersion());
             } catch (ZkBadVersionException e) {
