@@ -214,14 +214,12 @@ public class ZkClient implements Watcher, IZkClient {
     }
 
 
-    public void createPersistent(String path) throws ZkInterruptedException, IllegalArgumentException, ZkException,
-            RuntimeException {
+    public void createPersistent(String path){
         createPersistent(path, false);
     }
 
 
-    public void createPersistent(String path, boolean createParents) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException {
+    public void createPersistent(String path, boolean createParents) {
         try {
             create(path, null, CreateMode.PERSISTENT);
         } catch (ZkNodeExistsException e) {
@@ -239,25 +237,21 @@ public class ZkClient implements Watcher, IZkClient {
     }
 
 
-    public void createPersistent(String path, byte[] data) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException {
+    public void createPersistent(String path, byte[] data) {
         create(path, data, CreateMode.PERSISTENT);
     }
 
 
-    public String createPersistentSequential(String path, byte[] data) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException {
+    public String createPersistentSequential(String path, byte[] data) {
         return create(path, data, CreateMode.PERSISTENT_SEQUENTIAL);
     }
 
 
-    public void createEphemeral(final String path) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException {
+    public void createEphemeral(final String path) {
         create(path, null, CreateMode.EPHEMERAL);
     }
 
-    public String create(final String path, byte[] data, final CreateMode mode) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException {
+    public String create(final String path, byte[] data, final CreateMode mode){
         if (path == null) {
             throw new NullPointerException("path must not be null.");
         }
@@ -272,35 +266,11 @@ public class ZkClient implements Watcher, IZkClient {
         });
     }
 
-    /**
-     * Create an ephemeral node.
-     *
-     * @param path the path for the node
-     * @param data
-     * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
-     *                                  got interrupted
-     * @throws IllegalArgumentException if called from anything except the ZooKeeper event
-     *                                  thread
-     * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
-     */
     public void createEphemeral(final String path, final byte[] data) throws ZkInterruptedException,
             IllegalArgumentException, ZkException, RuntimeException {
         create(path, data, CreateMode.EPHEMERAL);
     }
 
-    /**
-     * Create an ephemeral, sequential node.
-     *
-     * @param path the path for the node
-     * @param data the initial data for the node
-     * @return created path
-     * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
-     *                                  got interrupted
-     * @throws IllegalArgumentException if called from anything except the ZooKeeper event
-     *                                  thread
-     * @throws ZkException              if any ZooKeeper exception occurred
-     */
     public String createEphemeralSequential(final String path, final byte[] data) throws ZkInterruptedException,
             IllegalArgumentException, ZkException {
         return create(path, data, CreateMode.EPHEMERAL_SEQUENTIAL);
@@ -368,13 +338,17 @@ public class ZkClient implements Watcher, IZkClient {
     }
 
     protected List<String> getChildren(final String path, final boolean watch) {
-        return retryUntilConnected(new Callable<List<String>>() {
+        try {
+            return retryUntilConnected(new Callable<List<String>>() {
 
-            @Override
-            public List<String> call() throws Exception {
-                return _connection.getChildren(path, watch);
-            }
-        });
+                @Override
+                public List<String> call() throws Exception {
+                    return _connection.getChildren(path, watch);
+                }
+            });
+        }catch (ZkNoNodeException e){
+            return null;
+        }
     }
 
 
@@ -598,7 +572,7 @@ public class ZkClient implements Watcher, IZkClient {
     }
 
     /**
-     * @param callable
+     * @param callable the callable object
      * @return result of Callable
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
@@ -741,13 +715,6 @@ public class ZkClient implements Watcher, IZkClient {
         });
     }
 
-    /**
-     * Installs a child watch for the given path.
-     *
-     * @param path
-     * @return the current children of the path or null if the zk node with the given path
-     *         doesn't exist.
-     */
     public List<String> watchForChilds(final String path) {
         if (_zookeeperEventThread != null && Thread.currentThread() == _zookeeperEventThread) {
             throw new IllegalArgumentException("Must not be done in the zookeeper event thread.");

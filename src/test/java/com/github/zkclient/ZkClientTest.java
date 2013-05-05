@@ -407,6 +407,7 @@ public class ZkClientTest {
         List<String> children = client.getChildren(path);
         assertEquals(3,children.size());
         assertEquals(3,client.countChildren(path));
+        assertNull(client.getChildren("/aaa"));
     }
 
     
