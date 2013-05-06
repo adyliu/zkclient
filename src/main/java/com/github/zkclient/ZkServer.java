@@ -17,7 +17,6 @@ package com.github.zkclient;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -38,9 +37,9 @@ public class ZkServer {
 
     public static final int DEFAULT_MIN_SESSION_TIMEOUT = 2 * DEFAULT_TICK_TIME;
 
-    private String _dataDir;
+    private final String _dataDir;
 
-    private String _logDir;
+    private final String _logDir;
 
     private ZooKeeperServer _zk;
 
@@ -48,11 +47,11 @@ public class ZkServer {
 
     private ZkClient _zkClient;
 
-    private int _port;
+    private final int _port;
 
-    private int _tickTime;
+    private final int _tickTime;
 
-    private int _minSessionTimeout;
+    private final int _minSessionTimeout;
 
     public ZkServer(String dataDir, String logDir) {
         this(dataDir, logDir, DEFAULT_PORT);
@@ -117,9 +116,12 @@ public class ZkServer {
 
     @PreDestroy
     public void shutdown() {
-        if (_zk == null) {
+        ZooKeeperServer zk = _zk;
+        if (zk == null) {
             LOG.warn("shutdown duplication");
             return;
+        }else {
+            _zk = null;
         }
         LOG.info("Shutting down ZkServer...");
         try {
@@ -136,17 +138,14 @@ public class ZkServer {
             }
             _nioFactory = null;
         }
-        if (_zk != null) {
-            _zk.shutdown();
-            if (_zk.getZKDatabase() != null) {
-                try {
-                    // release file description
-                    _zk.getZKDatabase().close();
-                } catch (IOException e) {
-                    LOG.error(e.getMessage(), e);
-                }
+        zk.shutdown();
+        if (zk.getZKDatabase() != null) {
+            try {
+                // release file description
+                zk.getZKDatabase().close();
+            } catch (IOException e) {
+                LOG.error(e.getMessage(), e);
             }
-            _zk = null;
         }
         LOG.info("Shutting down ZkServer...done");
     }

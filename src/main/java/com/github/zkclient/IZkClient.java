@@ -60,8 +60,7 @@ public interface IZkClient extends Closeable {
      * @throws ZkTimeoutException     if the connection timed out
      * @throws IllegalStateException  if the connection timed out due to thread interruption
      */
-    void connect(final long maxMsToWaitUntilConnected, Watcher watcher) throws ZkInterruptedException,
-            ZkTimeoutException, IllegalStateException;
+    void connect(final long maxMsToWaitUntilConnected, Watcher watcher);
 
     /**
      * Counts number of children for the given path.
@@ -78,15 +77,11 @@ public interface IZkClient extends Closeable {
      * @param data node data
      * @param mode create mode {@link CreateMode}
      * @return created path
-     * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
-     *                                  got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
-    String create(final String path, byte[] data, final CreateMode mode) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException;
+    String create(final String path, byte[] data, final CreateMode mode);
 
     /**
      * Create an ephemeral node with empty data
@@ -97,30 +92,26 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
-    void createEphemeral(final String path) throws ZkInterruptedException, IllegalArgumentException, ZkException,
-            RuntimeException;
+    void createEphemeral(final String path);
 
     /**
      * Create an ephemeral node.
      *
-     * @param path zk path
+     * @param path the path for the node
      * @param data node data
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
-    void createEphemeral(final String path, final byte[] data) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException;
+    void createEphemeral(final String path, final byte[] data);
 
     /**
      * Create an ephemeral, sequential node.
      *
-     * @param path
+     * @param path the path for the node
      * @param data
      * @return created path
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
@@ -128,29 +119,31 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
      */
-    String createEphemeralSequential(final String path, final byte[] data) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException;
+    String createEphemeralSequential(final String path, final byte[] data);
 
     /**
-     * Create a persistent node with empty data
+     * Create a persistent node with empty data (null)
      *
-     * @param path zk path
+     * @param path the path for the node
+     * @throws ZkNodeExistsException if the node exists
+     * @throws com.github.zkclient.exception.ZkNoNodeException if the parent node not exists
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
+     * @throws RuntimeException any other exception
+     * @see #createPersistent(String, boolean)
      */
-    void createPersistent(String path) throws ZkInterruptedException, IllegalArgumentException, ZkException,
-            RuntimeException;
+    void createPersistent(String path);
 
     /**
-     * Create a persistent node.
-     *
-     * @param path          zk path
+     * Create a persistent node with empty data (null)
+     * <p>
+     *     If the createParents is true, neither {@link ZkNodeExistsException} nor {@link com.github.zkclient.exception.ZkNoNodeException} were throwed.
+     * </p>
+     * @param path the path for the node
      * @param createParents if true all parent dirs are created as well and no
      *                      {@link ZkNodeExistsException} is thrown in case the path already exists
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
@@ -158,30 +151,28 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
+     * @throws RuntimeException any other exception
      */
-    void createPersistent(String path, boolean createParents) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException;
+    void createPersistent(String path, boolean createParents);
 
     /**
      * Create a persistent node.
      *
-     * @param path zk path
+     * @param path the path for the node
      * @param data node data
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
+     * @throws RuntimeException any other exception
      */
-    void createPersistent(String path, byte[] data) throws ZkInterruptedException, IllegalArgumentException, ZkException,
-            RuntimeException;
+    void createPersistent(String path, byte[] data);
 
     /**
      * Create a persistent, sequental node.
      *
-     * @param path zk path
+     * @param path the path for the node
      * @param data node data
      * @return create node's path
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
@@ -189,15 +180,14 @@ public interface IZkClient extends Closeable {
      * @throws IllegalArgumentException if called from anything except the ZooKeeper event
      *                                  thread
      * @throws ZkException              if any ZooKeeper exception occurred
-     * @throws RuntimeException         if any other exception occurs
+     * @throws RuntimeException any other exception
      */
-    String createPersistentSequential(String path, byte[] data) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException;
+    String createPersistentSequential(String path, byte[] data);
 
     /**
      * delete a node
      *
-     * @param path zk path
+     * @param path the path for the node
      * @return true if deleted; otherwise false
      */
     boolean delete(final String path);
@@ -205,15 +195,30 @@ public interface IZkClient extends Closeable {
     /**
      * delete a node with all children
      *
-     * @param path zk path
+     * @param path the path for the node
      * @return true if all deleted; otherwise false
      */
     boolean deleteRecursive(String path);
 
+    /**
+     * check the node exists
+     * @param path the path for the node
+     * @return true if the node exists
+     */
     boolean exists(final String path);
 
+    /**
+     * get the children for the node
+     * @param path the path for the node
+     * @return the children node names or null (then node not exists)
+     */
     List<String> getChildren(String path);
 
+    /**
+     * get the node creation time (unix milliseconds)
+     * @param path the path for the node
+     * @return the unix milliseconds or -1 if node not exists
+     */
     long getCreationTime(String path);
 
     /**
@@ -223,24 +228,79 @@ public interface IZkClient extends Closeable {
      */
     int numberOfListeners();
 
+    /**
+     * read the data for the node
+     * @param path the path for the node
+     * @return the data for the node
+     * @throws {@link com.github.zkclient.exception.ZkNoNodeException} if the node not exists
+     * @see {@link #readData(String, boolean)}
+     */
     byte[] readData(String path);
 
+    /**
+     * read the data for the node
+     * @param path the path for the node
+     * @param returnNullIfPathNotExists if true no {@link com.github.zkclient.exception.ZkNoNodeException} thrown
+     * @return the data for the node
+     */
     byte[] readData(String path, boolean returnNullIfPathNotExists);
 
+    /**
+     * read the data and stat for the node
+     * @param path the path for the node
+     * @param stat the stat for the node
+     * @return the data for the node
+     * @see {@link #readData(String, boolean)}
+     */
     byte[] readData(String path, Stat stat);
 
+    /**
+     * subscribe the changing for children
+     * @param path the path for the node
+     * @param listener the listener
+     * @return the children list or null if the node not exists
+     * @see {@link IZkChildListener}
+     */
     List<String> subscribeChildChanges(String path, IZkChildListener listener);
 
+    /**
+     * subscribe the data changing for the node
+     * @param path the path for the node
+     * @param listener the data changing listener
+     * @see {@link IZkDataListener}
+     */
     void subscribeDataChanges(String path, IZkDataListener listener);
 
+    /**
+     * subscribe the connection state
+     * @param listener the connection listener
+     * @see {@link IZkStateListener}
+     */
     void subscribeStateChanges(final IZkStateListener listener);
 
+    /**
+     * unsubscribe all listeners for all path and connection state
+     */
     void unsubscribeAll();
 
+    /**
+     * unsubscribe the child listener
+     * @param path the path for the node
+     * @param childListener the listener
+     */
     void unsubscribeChildChanges(String path, IZkChildListener childListener);
 
+    /**
+     * unsubscribe the data changing for the node
+     * @param path the path for the node
+     * @param dataListener the data changing listener
+     */
     void unsubscribeDataChanges(String path, IZkDataListener dataListener);
 
+    /**
+     * unsubscribe the connection state
+     * @param stateListener the connection listener
+     */
     void unsubscribeStateChanges(IZkStateListener stateListener);
 
     /**
@@ -251,23 +311,70 @@ public interface IZkClient extends Closeable {
      * the updater once again until the new contents can be successfully written back to
      * ZooKeeper.
      *
-     * @param path    The path of the znode.
+     * @param path the path for the node
      * @param updater Updater that creates the new contents.
      */
     void cas(String path, DataUpdater<byte[]> updater);
 
+    /**
+     * wait some time for the state
+     * @param keeperState the state
+     * @param time some time
+     * @param timeUnit the time unit
+     * @return true if the connection state is the <code>keeperState</code> before the end time
+     */
     boolean waitForKeeperState(KeeperState keeperState, long time, TimeUnit timeUnit);
 
+    /**
+     * wait for the connected state.
+     * <pre>
+     *     waitForKeeperState(KeeperState.SyncConnected, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
+     * </pre>
+     * @return true if the client connects the server
+     * @throws ZkInterruptedException
+     * @see {@link #waitForKeeperState(org.apache.zookeeper.Watcher.Event.KeeperState, long, java.util.concurrent.TimeUnit)}
+     */
     boolean waitUntilConnected() throws ZkInterruptedException;
 
+    /**
+     * wait for the connected state
+     * @param time soem time
+     * @param timeUnit the time unit
+     * @return  true if the client connects the server before the end time
+     */
     boolean waitUntilConnected(long time, TimeUnit timeUnit);
 
+    /**
+     * wait some unit until the node exists
+     * @param path the path for the node
+     * @param timeUnit the time unit
+     * @param time some time
+     * @return true if the node exists
+     */
     boolean waitUntilExists(String path, TimeUnit timeUnit, long time);
 
-    Stat writeData(String path, byte[] object);
+    /**
+     * write the data for the node
+     * @param path the path for the node
+     * @param data the data for the node
+     * @return the stat for the node
+     */
+    Stat writeData(String path, byte[] data);
 
-    Stat writeData(final String path, byte[] datat, final int expectedVersion);
+    /**
+     * write the data for the node
+     * @param path the path for the node
+     * @param data the data for the node
+     * @param expectedVersion the version for the node
+     * @return the stat for the node
+     * @see {@link #cas(String, com.github.zkclient.IZkClient.DataUpdater)}
+     */
+    Stat writeData(final String path, byte[] data, final int expectedVersion);
 
+    /**
+     * get the inner zookeeper client
+     * @return the inner zookeeper client
+     */
     ZooKeeper getZooKeeper();
 
     interface DataUpdater<T> {

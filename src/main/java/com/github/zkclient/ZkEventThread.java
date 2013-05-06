@@ -26,9 +26,9 @@ import com.github.zkclient.exception.ZkInterruptedException;
 /**
  * All listeners registered at the {@link ZkClient} will be notified from this event thread.
  * This is to prevent dead-lock situations. The {@link ZkClient} pulls some information out of
- * the {@link ZooKeeper} events to signal {@link ZkLock} conditions. Re-using the
- * {@link ZooKeeper} event thread to also notify {@link ZkClient} listeners, would stop the
- * ZkClient from receiving events from {@link ZooKeeper} as soon as one of the listeners blocks
+ * the {@link org.apache.zookeeper.ZooKeeper} events to signal {@link ZkLock} conditions. Re-using the
+ * {@link org.apache.zookeeper.ZooKeeper} event thread to also notify {@link ZkClient} listeners, would stop the
+ * ZkClient from receiving events from {@link org.apache.zookeeper.ZooKeeper} as soon as one of the listeners blocks
  * (because it is waiting for something). {@link ZkClient} would then for instance not be able
  * to maintain it's connection state anymore.
  */
@@ -36,15 +36,15 @@ class ZkEventThread extends Thread {
 
     private static final Logger LOG = Logger.getLogger(ZkEventThread.class);
 
-    private BlockingQueue<ZkEvent> _events = new LinkedBlockingQueue<ZkEvent>();
+    private final BlockingQueue<ZkEvent> _events = new LinkedBlockingQueue<ZkEvent>();
 
-    private static AtomicInteger _eventId = new AtomicInteger(0);
+    private static final AtomicInteger _eventId = new AtomicInteger(0);
 
     private volatile boolean shutdown = false;
 
     static abstract class ZkEvent {
 
-        private String _description;
+        private final String _description;
 
         public ZkEvent(String description) {
             _description = description;

@@ -1,6 +1,9 @@
 
 ## A [zookeeper](http://zookeeper.apache.org) client wrapper.
 
+[![Build Status](https://travis-ci.org/adyliu/zkclient.png?branch=master)](https://travis-ci.org/adyliu/zkclient)
+
+
 [2012-12-04]
     zkclient 2.0 released!
 

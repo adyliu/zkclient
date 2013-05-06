@@ -22,9 +22,9 @@ public class ZkLock extends ReentrantLock {
 
     private static final long serialVersionUID = 1L;
 
-    private Condition _dataChangedCondition = newCondition();
-    private Condition _stateChangedCondition = newCondition();
-    private Condition _zNodeEventCondition = newCondition();
+    private final Condition _dataChangedCondition = newCondition();
+    private final Condition _stateChangedCondition = newCondition();
+    private final Condition _zNodeEventCondition = newCondition();
 
     /**
      * This condition will be signaled if a zookeeper event was processed and the event contains a data/child change.
