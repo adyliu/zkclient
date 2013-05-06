@@ -80,11 +80,11 @@ public class ZkServer {
 
     @PostConstruct
     public void start() {
-        startZooKeeperServer();
+        startZkServer();
         _zkClient = new ZkClient("localhost:" + _port, 10000);
     }
 
-    private void startZooKeeperServer() {
+    private void startZkServer() {
         final int port = _port;
         if (ZkClientUtils.isPortFree(port)) {
             final File dataDir = new File(_dataDir);
