@@ -354,7 +354,10 @@ public class ZkClient implements Watcher, IZkClient {
 
     public int countChildren(String path) {
         try {
-            return getChildren(path).size();
+            Stat stat = new Stat();
+            this.readData(path,stat);
+            return stat.getNumChildren();
+            //return getChildren(path).size();
         } catch (ZkNoNodeException e) {
             return -1;
         }
