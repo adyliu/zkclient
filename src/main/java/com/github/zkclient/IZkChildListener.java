@@ -22,7 +22,7 @@ import java.util.List;
  * path.
  * <p/>
  * Node: Also this listener re-subscribes it watch for the path on each zk event (zk watches are one-timers) is is not
- * guaranteed that events on the path are missing (see http://zookeeper.wiki.sourceforge.net/ZooKeeperWatches). An
+ * guaranteed that events on the path are missing (see http://zookeeper.apache.org/doc/current/zookeeperProgrammers.html#ch_zkWatches). An
  * implementation of this class should take that into account.
  */
 public interface IZkChildListener {

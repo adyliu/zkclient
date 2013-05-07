@@ -276,7 +276,7 @@ public interface IZkClient extends Closeable {
      * @param listener the connection listener
      * @see {@link IZkStateListener}
      */
-    void subscribeStateChanges(final IZkStateListener listener);
+    void subscribeStateChanges(IZkStateListener listener);
 
     /**
      * unsubscribe all listeners for all path and connection state
@@ -369,7 +369,7 @@ public interface IZkClient extends Closeable {
      * @return the stat for the node
      * @see {@link #cas(String, com.github.zkclient.IZkClient.DataUpdater)}
      */
-    Stat writeData(final String path, byte[] data, final int expectedVersion);
+    Stat writeData(String path, byte[] data, int expectedVersion);
 
     /**
      * get the inner zookeeper client
