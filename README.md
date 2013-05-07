@@ -1,5 +1,5 @@
 
-## A [zookeeper](http://zookeeper.apache.org) client wrapper.
+## A simple and effective Java client for [zookeeper](http://zookeeper.apache.org).
 
 [![Build Status](https://travis-ci.org/adyliu/zkclient.png?branch=master)](https://travis-ci.org/adyliu/zkclient)
 
