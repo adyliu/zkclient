@@ -28,3 +28,8 @@ The version [1.x](http://repo1.maven.org/maven2/com/github/adyliu/zkclient/) nee
 ## Wiki
 
 The wiki links: [https://github.com/adyliu/zkclient/wiki](https://github.com/adyliu/zkclient/wiki)
+
+## Contributors
+
+* [YANGLiiN](https://github.com/yangl)
+* [Peter Voss](https://github.com/pvoss)
