@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.ConnectionLossException;
@@ -45,6 +44,8 @@ import com.github.zkclient.exception.ZkInterruptedException;
 import com.github.zkclient.exception.ZkNoNodeException;
 import com.github.zkclient.exception.ZkNodeExistsException;
 import com.github.zkclient.exception.ZkTimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Zookeeper client
@@ -54,7 +55,7 @@ import com.github.zkclient.exception.ZkTimeoutException;
  */
 public class ZkClient implements Watcher, IZkClient {
 
-    private final static Logger LOG = Logger.getLogger(ZkClient.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ZkClient.class);
 
     protected ZkConnection _connection;
 
