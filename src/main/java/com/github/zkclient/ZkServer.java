@@ -21,15 +21,16 @@ import java.io.IOException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.log4j.Logger;
 import org.apache.zookeeper.server.ZooKeeperServer;
 
 import com.github.zkclient.exception.ZkException;
 import com.github.zkclient.exception.ZkInterruptedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZkServer {
 
-    private final static Logger LOG = Logger.getLogger(ZkServer.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ZkServer.class);;
 
     public static final int DEFAULT_PORT = 2181;
 
@@ -79,11 +80,11 @@ public class ZkServer {
 
     @PostConstruct
     public void start() {
-        startZooKeeperServer();
+        startZkServer();
         _zkClient = new ZkClient("localhost:" + _port, 10000);
     }
 
-    private void startZooKeeperServer() {
+    private void startZkServer() {
         final int port = _port;
         if (ZkClientUtils.isPortFree(port)) {
             final File dataDir = new File(_dataDir);

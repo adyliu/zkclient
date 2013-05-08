@@ -1,37 +1,28 @@
 /**
  * Copyright 2010 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package com.github.zkclient;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.net.*;
 
 import com.github.zkclient.exception.ZkInterruptedException;
 
 public class ZkClientUtils {
+
+    private ZkClientUtils() {}
 
     public static enum ZkVersion {
         V33, V34
@@ -44,9 +35,11 @@ public class ZkClientUtils {
         try {
             Class.forName("org.apache.zookeeper.OpResult");
             version = ZkVersion.V34;
-        } catch (ClassNotFoundException e) {
+        }
+        catch (ClassNotFoundException e) {
             version = ZkVersion.V33;
-        } finally {
+        }
+        finally {
             zkVersion = version;
         }
 
@@ -64,8 +57,9 @@ public class ZkClientUtils {
      * This sets the interrupt flag if the catched exception was an
      * {@link InterruptedException}. Catching such an exception always clears
      * the interrupt flag.
-     *
-     * @param catchedException The catched exception.
+     * 
+     * @param catchedException
+     *            The catched exception.
      */
     public static void retainInterruptFlag(Throwable catchedException) {
         if (catchedException instanceof InterruptedException) {
@@ -88,25 +82,29 @@ public class ZkClientUtils {
 
     public final static String OVERWRITE_HOSTNAME_SYSTEM_PROPERTY = "zkclient.hostname.overwritten";
 
-
     public static boolean isPortFree(int port) {
         try {
             Socket socket = new Socket();
             socket.connect(new InetSocketAddress("localhost", port), 200);
             socket.close();
             return false;
-        } catch (SocketTimeoutException e) {
+        }
+        catch (SocketTimeoutException e) {
             return true;
-        } catch (ConnectException e) {
+        }
+        catch (ConnectException e) {
             return true;
-        } catch (SocketException e) {
+        }
+        catch (SocketException e) {
             if (e.getMessage().equals("Connection reset by peer")) {
                 return true;
             }
             throw new RuntimeException(e);
-        } catch (UnknownHostException e) {
+        }
+        catch (UnknownHostException e) {
             throw new RuntimeException(e);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -118,7 +116,8 @@ public class ZkClientUtils {
         }
         try {
             return InetAddress.getLocalHost().getHostName();
-        } catch (final UnknownHostException e) {
+        }
+        catch (final UnknownHostException e) {
             throw new RuntimeException("unable to retrieve localhost name");
         }
     }

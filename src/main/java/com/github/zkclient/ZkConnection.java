@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.Watcher;
@@ -32,10 +31,12 @@ import org.apache.zookeeper.ZooKeeper.States;
 import org.apache.zookeeper.data.Stat;
 
 import com.github.zkclient.exception.ZkException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZkConnection {
 
-    private static final Logger LOG = Logger.getLogger(ZkConnection.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ZkConnection.class);
 
     /**
      * It is recommended to use quite large sessions timeouts for ZooKeeper.

@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
-import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.data.Stat;
@@ -23,6 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.github.zkclient.exception.ZkNoNodeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -40,7 +41,7 @@ public class ZkClientTest {
     static {
         System.setProperty("zookeeper.preAllocSize", "1024");// 1M data log
     }
-    final Logger logger = Logger.getLogger(ZkClientTest.class);
+    final Logger logger = LoggerFactory.getLogger(ZkClientTest.class);
     private static final AtomicInteger counter = new AtomicInteger();
     //
     private ZkServer server;
@@ -117,7 +118,7 @@ public class ZkClientTest {
         //
         client.subscribeChildChanges(path, listener);
         //
-        logger.info("create the watcher node "+path);
+        logger.info("create the watcher node " + path);
         client.createPersistent(path);
         //wait some time to make sure the event was triggered
         TestUtil.waitUntil(1, new Callable<Integer>() {
@@ -132,7 +133,7 @@ public class ZkClientTest {
         //
         //create a child node
         count.set(0);
-        client.createPersistent(path+"/child1");
+        client.createPersistent(path + "/child1");
         logger.info("create the first child node "+path+"/child1");
         TestUtil.waitUntil(1, new Callable<Integer>() {
             @Override
@@ -150,7 +151,7 @@ public class ZkClientTest {
         logger.info("create the second child node "+path+"/child2");
         client.createPersistent(path+"/child2");
         //
-        logger.info("delete the watcher node "+path);
+        logger.info("delete the watcher node " + path);
         client.deleteRecursive(path);
         //
         Boolean eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
@@ -160,7 +161,7 @@ public class ZkClientTest {
             }
         }, TimeUnit.SECONDS, 15);
         assertTrue(eventReceived);
-        assertEquals(0,children.size());
+        assertEquals(0, children.size());
         // ===========================================
         // do it again and check the listener validate
         // ===========================================
@@ -176,7 +177,7 @@ public class ZkClientTest {
             }
         }, TimeUnit.SECONDS, 15);
         assertTrue(eventReceived);
-        assertEquals(0,children.size());
+        assertEquals(0, children.size());
         //
         // now create the first node
         count.set(0);
@@ -195,7 +196,7 @@ public class ZkClientTest {
         //
         // delete root node 
         count.set(0);
-        logger.info("delete the watcher node again "+path);
+        logger.info("delete the watcher node again " + path);
         client.deleteRecursive(path);
         //
         eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
