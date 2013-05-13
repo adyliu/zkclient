@@ -215,7 +215,7 @@ public class ZkClient implements Watcher, IZkClient {
     }
 
 
-    public void createPersistent(String path){
+    public void createPersistent(String path) {
         createPersistent(path, false);
     }
 
@@ -252,7 +252,7 @@ public class ZkClient implements Watcher, IZkClient {
         create(path, null, CreateMode.EPHEMERAL);
     }
 
-    public String create(final String path, byte[] data, final CreateMode mode){
+    public String create(final String path, byte[] data, final CreateMode mode) {
         if (path == null) {
             throw new NullPointerException("path must not be null.");
         }
@@ -267,13 +267,11 @@ public class ZkClient implements Watcher, IZkClient {
         });
     }
 
-    public void createEphemeral(final String path, final byte[] data) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException, RuntimeException {
+    public void createEphemeral(final String path, final byte[] data) {
         create(path, data, CreateMode.EPHEMERAL);
     }
 
-    public String createEphemeralSequential(final String path, final byte[] data) throws ZkInterruptedException,
-            IllegalArgumentException, ZkException {
+    public String createEphemeralSequential(final String path, final byte[] data) {
         return create(path, data, CreateMode.EPHEMERAL_SEQUENTIAL);
     }
 
@@ -283,8 +281,10 @@ public class ZkClient implements Watcher, IZkClient {
 
         boolean stateChanged = event.getPath() == null;
         boolean znodeChanged = event.getPath() != null;
-        boolean dataChanged = event.getType() == EventType.NodeDataChanged || event.getType() == EventType.NodeDeleted || event
-                .getType() == EventType.NodeCreated || event.getType() == EventType.NodeChildrenChanged;
+        boolean dataChanged = event.getType() == EventType.NodeDataChanged || //
+                event.getType() == EventType.NodeDeleted ||
+                event.getType() == EventType.NodeCreated || //
+                event.getType() == EventType.NodeChildrenChanged;
 
         getEventLock().lock();
         try {
@@ -347,7 +347,7 @@ public class ZkClient implements Watcher, IZkClient {
                     return _connection.getChildren(path, watch);
                 }
             });
-        }catch (ZkNoNodeException e){
+        } catch (ZkNoNodeException e) {
             return null;
         }
     }
@@ -356,7 +356,7 @@ public class ZkClient implements Watcher, IZkClient {
     public int countChildren(String path) {
         try {
             Stat stat = new Stat();
-            this.readData(path,stat);
+            this.readData(path, stat);
             return stat.getNumChildren();
             //return getChildren(path).size();
         } catch (ZkNoNodeException e) {
@@ -452,15 +452,18 @@ public class ZkClient implements Watcher, IZkClient {
     private void processDataOrChildChange(WatchedEvent event) {
         final String path = event.getPath();
 
-        if (event.getType() == EventType.NodeChildrenChanged || event.getType() == EventType.NodeCreated || event
-                .getType() == EventType.NodeDeleted) {
+        if (event.getType() == EventType.NodeChildrenChanged ||
+                event.getType() == EventType.NodeCreated ||
+                event.getType() == EventType.NodeDeleted) {
             Set<IZkChildListener> childListeners = _childListener.get(path);
             if (childListeners != null && !childListeners.isEmpty()) {
                 fireChildChangedEvents(path, childListeners);
             }
         }
 
-        if (event.getType() == EventType.NodeDataChanged || event.getType() == EventType.NodeDeleted || event.getType() == EventType.NodeCreated) {
+        if (event.getType() == EventType.NodeDataChanged ||
+                event.getType() == EventType.NodeDeleted ||
+                event.getType() == EventType.NodeCreated) {
             Set<IZkDataListener> listeners = _dataListener.get(path);
             if (listeners != null && !listeners.isEmpty()) {
                 fireDataChangedEvents(event.getPath(), listeners);
@@ -585,8 +588,7 @@ public class ZkClient implements Watcher, IZkClient {
      * @throws ZkException              if any ZooKeeper exception occurred
      * @throws RuntimeException         if any other exception occurs from invoking the Callable
      */
-    public <E> E retryUntilConnected(Callable<E> callable) throws ZkInterruptedException, IllegalArgumentException,
-            ZkException, RuntimeException {
+    public <E> E retryUntilConnected(Callable<E> callable) {
         if (_zookeeperEventThread != null && Thread.currentThread() == _zookeeperEventThread) {
             throw new IllegalArgumentException("Must not be done in the zookeeper event thread.");
         }
@@ -739,8 +741,7 @@ public class ZkClient implements Watcher, IZkClient {
     }
 
 
-    public void connect(final long maxMsToWaitUntilConnected, Watcher watcher) throws ZkInterruptedException,
-            ZkTimeoutException, IllegalStateException {
+    public void connect(final long maxMsToWaitUntilConnected, Watcher watcher) {
         boolean started = false;
         try {
             getEventLock().lockInterruptibly();
