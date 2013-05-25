@@ -61,7 +61,7 @@ public class ZkClient implements Watcher, IZkClient {
 
     private final Map<String, Set<IZkChildListener>> _childListener = new ConcurrentHashMap<String, Set<IZkChildListener>>();
 
-    private final ConcurrentHashMap<String, Set<IZkDataListener>> _dataListener = new ConcurrentHashMap<String, Set<IZkDataListener>>();
+    private final Map<String, Set<IZkDataListener>> _dataListener = new ConcurrentHashMap<String, Set<IZkDataListener>>();
 
     private final Set<IZkStateListener> _stateListener = new CopyOnWriteArraySet<IZkStateListener>();
 
@@ -834,6 +834,16 @@ public class ZkClient implements Watcher, IZkClient {
         listeners += _stateListener.size();
 
         return listeners;
+    }
+
+    @Override
+    public List<?> multi(final Iterable<?> ops) {
+        return retryUntilConnected(new Callable<List<?>>() {
+            @Override
+            public List<?> call() throws Exception {
+                return _connection.multi(ops);
+            }
+        });
     }
 
     @Override

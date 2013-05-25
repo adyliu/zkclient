@@ -54,13 +54,13 @@ public interface IZkClient extends Closeable {
     /**
      * Connect to ZooKeeper.
      *
-     * @param maxMsToWaitUntilConnected
+     * @param timeout max waiting time(ms) until connected
      * @param watcher                   default watcher
      * @throws ZkInterruptedException if the connection timed out due to thread interruption
      * @throws ZkTimeoutException     if the connection timed out
      * @throws IllegalStateException  if the connection timed out due to thread interruption
      */
-    void connect(final long maxMsToWaitUntilConnected, Watcher watcher);
+    void connect(final long timeout, Watcher watcher);
 
     /**
      * Counts number of children for the given path.
@@ -112,7 +112,7 @@ public interface IZkClient extends Closeable {
      * Create an ephemeral, sequential node.
      *
      * @param path the path for the node
-     * @param data
+     * @param data the data for the node
      * @return created path
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted
@@ -370,6 +370,16 @@ public interface IZkClient extends Closeable {
      * @see {@link #cas(String, com.github.zkclient.IZkClient.DataUpdater)}
      */
     Stat writeData(String path, byte[] data, int expectedVersion);
+
+    /**
+     * multi operation for zookeeper 3.4.x
+     * @param ops operations
+     * @return op result
+     * @see {@link org.apache.zookeeper.ZooKeeper#multi(Iterable)}
+     * @see {@link org.apache.zookeeper.Op}
+     * @see {@link org.apache.zookeeper.OpResult}
+     */
+    List<?> multi(Iterable<?> ops);
 
     /**
      * get the inner zookeeper client

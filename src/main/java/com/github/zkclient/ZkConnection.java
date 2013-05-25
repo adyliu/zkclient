@@ -38,11 +38,6 @@ public class ZkConnection {
 
     private static final Logger LOG = LoggerFactory.getLogger(ZkConnection.class);
 
-    /**
-     * It is recommended to use quite large sessions timeouts for ZooKeeper.
-     */
-    private static final int DEFAULT_SESSION_TIMEOUT = 30000;
-
     private ZooKeeper _zk = null;
     private final Lock _zookeeperLock = new ReentrantLock();
 
@@ -63,11 +58,8 @@ public class ZkConnection {
         method = m;
     }
 
-    public ZkConnection(String zkServers) {
-        this(zkServers, DEFAULT_SESSION_TIMEOUT);
-    }
-
     /**
+     * build a zookeeper connection
      * @param zkServers      zookeeper connection string
      * @param sessionTimeOut session timeout in milliseconds
      */
@@ -133,10 +125,10 @@ public class ZkConnection {
      * @return OpResult list
      */
     @SuppressWarnings("unchecked")
-    public List<Object> multi(Iterable<Object> ops) {
+    public List<?> multi(Iterable<?> ops) {
         if (method == null) throw new UnsupportedOperationException("multi operation must use zookeeper 3.4+");
         try {
-            return (List<Object>) method.invoke(_zk, ops);
+            return (List<?>) method.invoke(_zk, ops);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedOperationException("ops must be 'org.apache.zookeeper.Op'");
         } catch (IllegalAccessException e) {
@@ -146,20 +138,12 @@ public class ZkConnection {
         }
     }
 
-    public Stat writeData(String path, byte[] data) throws KeeperException, InterruptedException {
-        return writeData(path, data, -1);
-    }
-
     public Stat writeData(String path, byte[] data, int version) throws KeeperException, InterruptedException {
         return _zk.setData(path, data, version);
     }
 
     public States getZookeeperState() {
         return _zk != null ? _zk.getState() : null;
-    }
-
-    public ZooKeeper getZookeeper() {
-        return _zk;
     }
 
     public long getCreateTime(String path) throws KeeperException, InterruptedException {
