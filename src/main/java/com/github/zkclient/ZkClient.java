@@ -15,16 +15,13 @@
  */
 package com.github.zkclient;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.TimeUnit;
-
+import com.github.zkclient.ZkEventThread.ZkEvent;
+import com.github.zkclient.exception.ZkBadVersionException;
+import com.github.zkclient.exception.ZkException;
+import com.github.zkclient.exception.ZkInterruptedException;
+import com.github.zkclient.exception.ZkNoNodeException;
+import com.github.zkclient.exception.ZkNodeExistsException;
+import com.github.zkclient.exception.ZkTimeoutException;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.ConnectionLossException;
@@ -36,16 +33,18 @@ import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooKeeper.States;
 import org.apache.zookeeper.data.Stat;
-
-import com.github.zkclient.ZkEventThread.ZkEvent;
-import com.github.zkclient.exception.ZkBadVersionException;
-import com.github.zkclient.exception.ZkException;
-import com.github.zkclient.exception.ZkInterruptedException;
-import com.github.zkclient.exception.ZkNoNodeException;
-import com.github.zkclient.exception.ZkNodeExistsException;
-import com.github.zkclient.exception.ZkTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Zookeeper client
@@ -685,7 +684,7 @@ public class ZkClient implements Watcher, IZkClient {
         return writeData(path, object, -1);
     }
 
-    public void cas(String path, DataUpdater<byte[]> updater) {
+    public void cas(String path, DataUpdater updater) {
         Stat stat = new Stat();
         boolean retry;
         do {
