@@ -1,7 +1,18 @@
 /**
- * 
+ *
  */
 package com.github.zkclient;
+
+import com.github.zkclient.exception.ZkNoNodeException;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
+import org.apache.zookeeper.data.Stat;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,18 +24,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
 
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.Watcher.Event.KeeperState;
-import org.apache.zookeeper.data.Stat;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.github.zkclient.exception.ZkNoNodeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,7 +32,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * 
  * @author adyliu (imxylz@gmail.com)
  * @since 2012-12-3
  */
@@ -41,12 +39,13 @@ public class ZkClientTest {
     static {
         System.setProperty("zookeeper.preAllocSize", "1024");// 1M data log
     }
+
     final Logger logger = LoggerFactory.getLogger(ZkClientTest.class);
     private static final AtomicInteger counter = new AtomicInteger();
     //
     private ZkServer server;
     private ZkClient client;
-
+    final int TIMEOUT = 30;//30 second for loop timeout
 
     //
     private static void deleteFile(File f) throws IOException {
@@ -79,10 +78,10 @@ public class ZkClientTest {
     }
 
     @AfterClass
-    public static void cleanup() throws IOException{
-        deleteFile(new File(".","build/test").getCanonicalFile());
+    public static void cleanup() throws IOException {
+        deleteFile(new File(".", "build/test").getCanonicalFile());
     }
-    
+
     @Before
     public void setUp() throws Exception {
         this.server = startZkServer("server_" + counter.incrementAndGet(), 4711);
@@ -91,7 +90,7 @@ public class ZkClientTest {
 
     @After
     public void tearDown() throws Exception {
-        if (this.server != null){
+        if (this.server != null) {
             this.server.shutdown();
         }
     }
@@ -102,7 +101,7 @@ public class ZkClientTest {
      * .
      */
     @Test
-    public void testSubscribeChildChanges() throws Exception{
+    public void testSubscribeChildChanges() throws Exception {
         final String path = "/a";
         final AtomicInteger count = new AtomicInteger(0);
         final ArrayList<String> children = new ArrayList<String>();
@@ -110,9 +109,9 @@ public class ZkClientTest {
             public void handleChildChange(String parentPath, List<String> currentChildren) throws Exception {
                 count.incrementAndGet();
                 children.clear();
-                if(currentChildren!=null)
-                children.addAll(currentChildren);
-                logger.info("handle childchange "+parentPath+", "+currentChildren);
+                if (currentChildren != null)
+                    children.addAll(currentChildren);
+                logger.info("handle childchange " + parentPath + ", " + currentChildren);
             }
         };
         //
@@ -126,30 +125,30 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return count.get();
             }
-        }, TimeUnit.SECONDS, 15);
+        }, TimeUnit.SECONDS, TIMEOUT);
         //
-        assertEquals(1,count.get());
-        assertEquals(0,children.size());
+        assertEquals(1, count.get());
+        assertEquals(0, children.size());
         //
         //create a child node
         count.set(0);
         client.createPersistent(path + "/child1");
-        logger.info("create the first child node "+path+"/child1");
+        logger.info("create the first child node " + path + "/child1");
         TestUtil.waitUntil(1, new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 return count.get();
             }
-        }, TimeUnit.SECONDS, 15);
+        }, TimeUnit.SECONDS, TIMEOUT);
         //
-        assertEquals(1,count.get());
-        assertEquals(1,children.size());
-        assertEquals("child1",children.get(0));
+        assertEquals(1, count.get());
+        assertEquals(1, children.size());
+        assertEquals("child1", children.get(0));
         //
         // create another child node and delete the node
         count.set(0);
-        logger.info("create the second child node "+path+"/child2");
-        client.createPersistent(path+"/child2");
+        logger.info("create the second child node " + path + "/child2");
+        client.createPersistent(path + "/child2");
         //
         logger.info("delete the watcher node " + path);
         client.deleteRecursive(path);
@@ -157,9 +156,9 @@ public class ZkClientTest {
         Boolean eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                return count.get()>0&&children.size()==0;
+                return count.get() > 0 && children.size() == 0;
             }
-        }, TimeUnit.SECONDS, 15);
+        }, TimeUnit.SECONDS, TIMEOUT);
         assertTrue(eventReceived);
         assertEquals(0, children.size());
         // ===========================================
@@ -167,53 +166,57 @@ public class ZkClientTest {
         // ===========================================
         count.set(0);
         //
-        logger.info("create the watcher node again "+path);
+        logger.info("create the watcher node again " + path);
         client.createPersistent(path);
         //
         eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                return count.get()>0;
+                return count.get() > 0;
             }
-        }, TimeUnit.SECONDS, 15);
+        }, TimeUnit.SECONDS, TIMEOUT);
         assertTrue(eventReceived);
         assertEquals(0, children.size());
         //
         // now create the first node
         count.set(0);
-        client.createPersistent(path+"/child");
-        logger.info("create the first child node again "+path+"/child1");
+        final String child3 = "/child3";
+        client.createPersistent(path + child3);
+        logger.info("create the first child node again " + path + child3);
         //
         eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                return count.get()>0;
+                return count.get() > 0;
             }
         }, TimeUnit.SECONDS, 15);
         assertTrue(eventReceived);
-        assertEquals(1,children.size());
-        assertEquals("child",children.get(0));
+        assertEquals(1, children.size());
+        assertEquals("child3", children.get(0));
         //
         // delete root node 
         count.set(0);
         logger.info("delete the watcher node again " + path);
         client.deleteRecursive(path);
+        // This will receive two message: (1) child was deleted (2) parent was deleted
         //
         eventReceived = TestUtil.waitUntil(true, new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                return count.get()>0;
+                return children.isEmpty();
             }
-        }, TimeUnit.SECONDS, 15);
+        }, TimeUnit.SECONDS, TIMEOUT);
         assertTrue(eventReceived);
-        assertEquals(0,children.size());
+        assertTrue(children.isEmpty());
     }
 
     static class Holder<T> {
         T t;
+
         public void set(T t) {
             this.t = t;
         }
+
         public T get() {
             return t;
         }
@@ -221,25 +224,27 @@ public class ZkClientTest {
 
     static byte[] toBytes(String s) {
         try {
-            return s!=null?s.getBytes("UTF-8"):null;
+            return s != null ? s.getBytes("UTF-8") : null;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
+
     static String toString(byte[] b) {
         try {
-            return b!=null?new String(b,"UTF-8"):null;
+            return b != null ? new String(b, "UTF-8") : null;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Test method for
      * {@link com.github.zkclient.ZkClient#subscribeDataChanges(java.lang.String, com.github.zkclient.IZkDataListener)}
      * .
      */
     @Test
-    public void testSubscribeDataChanges() throws Exception{
+    public void testSubscribeDataChanges() throws Exception {
         String path = "/a";
         final AtomicInteger countChanged = new AtomicInteger(0);
         final AtomicInteger countDeleted = new AtomicInteger(0);
@@ -249,6 +254,7 @@ public class ZkClientTest {
                 countDeleted.incrementAndGet();
                 holder.set(null);
             }
+
             public void handleDataChange(String dataPath, byte[] data) throws Exception {
                 countChanged.incrementAndGet();
                 holder.set(ZkClientTest.toString(data));
@@ -257,7 +263,7 @@ public class ZkClientTest {
         client.subscribeDataChanges(path, listener);
         //
         // create the node
-        client.createPersistent(path,toBytes("aaa"));
+        client.createPersistent(path, toBytes("aaa"));
         //
         //wait some time to make sure the event was triggered
         TestUtil.waitUntil(1, new Callable<Integer>() {
@@ -265,10 +271,10 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return countChanged.get();
             }
-        }, TimeUnit.SECONDS, 15);
-        assertEquals(1,countChanged.get());
-        assertEquals(0,countDeleted.get());
-        assertEquals("aaa",holder.get());
+        }, TimeUnit.SECONDS, TIMEOUT);
+        assertEquals(1, countChanged.get());
+        assertEquals(0, countDeleted.get());
+        assertEquals("aaa", holder.get());
         //
         countChanged.set(0);
         countDeleted.set(0);
@@ -279,24 +285,24 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return countDeleted.get();
             }
-        }, TimeUnit.SECONDS, 15);
-        assertEquals(0,countChanged.get());
-        assertEquals(1,countDeleted.get());
+        }, TimeUnit.SECONDS, TIMEOUT);
+        assertEquals(0, countChanged.get());
+        assertEquals(1, countDeleted.get());
         assertNull(holder.get());
         // ===========================================
         // do it again and check the listener validate
         // ===========================================
         countChanged.set(0);
         countDeleted.set(0);
-        client.createPersistent(path,toBytes("bbb"));
+        client.createPersistent(path, toBytes("bbb"));
         TestUtil.waitUntil(1, new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 return countChanged.get();
             }
-        }, TimeUnit.SECONDS, 15);
-        assertEquals(1,countChanged.get());
-        assertEquals("bbb",holder.get());
+        }, TimeUnit.SECONDS, TIMEOUT);
+        assertEquals(1, countChanged.get());
+        assertEquals("bbb", holder.get());
         //
         countChanged.set(0);
         client.writeData(path, toBytes("ccc"));
@@ -306,9 +312,9 @@ public class ZkClientTest {
             public Integer call() throws Exception {
                 return countChanged.get();
             }
-        }, TimeUnit.SECONDS, 15);
-        assertEquals(1,countChanged.get());
-        assertEquals("ccc",holder.get());
+        }, TimeUnit.SECONDS, TIMEOUT);
+        assertEquals(1, countChanged.get());
+        assertEquals("ccc", holder.get());
     }
 
 
@@ -339,7 +345,7 @@ public class ZkClientTest {
     public void testCreatePersistentStringByteArray() {
         String path = "/a";
         client.createPersistent(path, toBytes("abc"));
-        assertEquals("abc",toString(client.readData(path)));
+        assertEquals("abc", toString(client.readData(path)));
         //
     }
 
@@ -352,9 +358,9 @@ public class ZkClientTest {
     public void testCreatePersistentSequential() {
         String path = "/a";
         String npath = client.createPersistentSequential(path, toBytes("abc"));
-        assertTrue(npath!=null&&npath.length()>0);
+        assertTrue(npath != null && npath.length() > 0);
         npath = client.createPersistentSequential(path, toBytes("abc"));
-        assertEquals("abc",toString(client.readData(npath)));
+        assertEquals("abc", toString(client.readData(npath)));
     }
 
     /**
@@ -367,7 +373,7 @@ public class ZkClientTest {
         client.createEphemeral(path);
         Stat stat = new Stat();
         client.readData(path, stat);
-        assertTrue(stat.getEphemeralOwner()>0);
+        assertTrue(stat.getEphemeralOwner() > 0);
     }
 
     /**
@@ -379,21 +385,20 @@ public class ZkClientTest {
     public void testCreate() {
         String path = "/a";
         client.create(path, toBytes("abc"), CreateMode.PERSISTENT);
-        assertEquals("abc",toString(client.readData(path)));
+        assertEquals("abc", toString(client.readData(path)));
     }
 
-   
+
     @Test
     public void testCreateEphemeralSequential() {
         String path = "/a";
         String npath = client.createEphemeralSequential(path, toBytes("abc"));
-        assertTrue(npath!=null&&npath.startsWith("/a"));
+        assertTrue(npath != null && npath.startsWith("/a"));
         Stat stat = new Stat();
-        assertArrayEquals(toBytes("abc"),client.readData(npath, stat));
-        assertTrue(stat.getEphemeralOwner()>0);
+        assertArrayEquals(toBytes("abc"), client.readData(npath, stat));
+        assertTrue(stat.getEphemeralOwner() > 0);
     }
 
-    
 
     /**
      * Test method for
@@ -402,16 +407,15 @@ public class ZkClientTest {
     @Test
     public void testGetChildrenString() {
         String path = "/a";
-        client.createPersistent(path+"/ch1",true);
-        client.createPersistent(path+"/ch2");
-        client.createPersistent(path+"/ch3");
+        client.createPersistent(path + "/ch1", true);
+        client.createPersistent(path + "/ch2");
+        client.createPersistent(path + "/ch3");
         List<String> children = client.getChildren(path);
-        assertEquals(3,children.size());
-        assertEquals(3,client.countChildren(path));
+        assertEquals(3, children.size());
+        assertEquals(3, client.countChildren(path));
         assertNull(client.getChildren("/aaa"));
     }
 
-    
 
     /**
      * Test method for
@@ -468,7 +472,7 @@ public class ZkClientTest {
      */
     @Test
     public void testWaitUntilConnected() {
-        ZkClient client2 = new ZkClient("localhost:4711",15000);
+        ZkClient client2 = new ZkClient("localhost:4711", 15000);
         assertTrue(client2.waitUntilConnected());
         server.shutdown();
         //
@@ -478,7 +482,6 @@ public class ZkClientTest {
         client2.close();
     }
 
-    
 
     /**
      * Test method for
@@ -494,33 +497,35 @@ public class ZkClientTest {
         assertTrue(stat.getDataLength() > 0);
     }
 
-   
 
     /**
      * Test method for {@link com.github.zkclient.ZkClient#numberOfListeners()}.
      */
     @Test
     public void testNumberOfListeners() {
-        IZkChildListener zkChildListener = new AbstractListener() {};
+        IZkChildListener zkChildListener = new AbstractListener() {
+        };
         client.subscribeChildChanges("/", zkChildListener);
-        assertEquals(1,client.numberOfListeners());
+        assertEquals(1, client.numberOfListeners());
         //
-        IZkDataListener zkDataListener = new AbstractListener() {};
+        IZkDataListener zkDataListener = new AbstractListener() {
+        };
         client.subscribeDataChanges("/a", zkDataListener);
-        assertEquals(2,client.numberOfListeners());
+        assertEquals(2, client.numberOfListeners());
         //
         client.subscribeDataChanges("/b", zkDataListener);
-        assertEquals(3,client.numberOfListeners());
+        assertEquals(3, client.numberOfListeners());
         //
-        IZkStateListener zkStateListener = new AbstractListener() {};
+        IZkStateListener zkStateListener = new AbstractListener() {
+        };
         client.subscribeStateChanges(zkStateListener);
-        assertEquals(4,client.numberOfListeners());
+        assertEquals(4, client.numberOfListeners());
         //
         client.unsubscribeChildChanges("/", zkChildListener);
-        assertEquals(3,client.numberOfListeners());
+        assertEquals(3, client.numberOfListeners());
         //
         client.unsubscribeAll();
-        assertEquals(0,client.numberOfListeners());
+        assertEquals(0, client.numberOfListeners());
     }
 
     /**
@@ -528,22 +533,22 @@ public class ZkClientTest {
      */
     @Test
     public void testGetZooKeeper() {
-        assertTrue(client.getZooKeeper()!=null);
+        assertTrue(client.getZooKeeper() != null);
     }
-    
+
     @Test
     public void testRetryUnitConnected_SessionExpiredException() {
         int sessionTimeout = 200;
         int port = PortUtils.checkAvailablePort(4712);
         int dport = this.server.getPort();
-        Gateway gateway = new Gateway(port,dport);
+        Gateway gateway = new Gateway(port, dport);
         gateway.start();
         //
-        final ZkClient client2 = new ZkClient("localhost:"+port,sessionTimeout,15000);
+        final ZkClient client2 = new ZkClient("localhost:" + port, sessionTimeout, 15000);
         gateway.stop();
         //
         //start the server after 600ms
-        new DeferredGatewayStarter(gateway, sessionTimeout*3).start();
+        new DeferredGatewayStarter(gateway, sessionTimeout * 3).start();
         //
         final Boolean connected = client2.retryUntilConnected(new Callable<Boolean>() {
             @Override
@@ -558,23 +563,23 @@ public class ZkClientTest {
         gateway.stop();
         //
     }
-    
-    
+
+
     @Test
-    public void testChildListenerAfterSessionExpiredException() throws Exception{
+    public void testChildListenerAfterSessionExpiredException() throws Exception {
         final int sessionTimeout = 200;
         ZkClient connectedClient = server.getZkClient();
         connectedClient.createPersistent("/root");
         //
         int port = PortUtils.checkAvailablePort(4712);
         int dport = this.server.getPort();
-        Gateway gateway = new Gateway(port,dport);
+        Gateway gateway = new Gateway(port, dport);
         gateway.start();
         //
-        final ZkClient disconnectedClient = new ZkClient("localhost:"+port,sessionTimeout,15000);
+        final ZkClient disconnectedClient = new ZkClient("localhost:" + port, sessionTimeout, 15000);
         final Holder<List<String>> children = new Holder<List<String>>();
         disconnectedClient.subscribeChildChanges("/root", new IZkChildListener() {
-            
+
             @Override
             public void handleChildChange(String parentPath, List<String> currentChildren) throws Exception {
                 children.set(currentChildren);
@@ -586,7 +591,7 @@ public class ZkClientTest {
         connectedClient.createPersistent("/root/node1");
         //
         // wait for 3x sessionTImeout, the session should have expired
-        Thread.sleep(3*sessionTimeout);
+        Thread.sleep(3 * sessionTimeout);
         //
         // now start the gateway
         gateway.start();
@@ -594,13 +599,13 @@ public class ZkClientTest {
         Boolean hasOneChild = TestUtil.waitUntil(true, new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                return children.get()!=null&&children.get().size()==1;
+                return children.get() != null && children.get().size() == 1;
             }
-        }, TimeUnit.SECONDS, 15);
+        }, TimeUnit.SECONDS, TIMEOUT);
         //
         assertTrue(hasOneChild);
-        assertEquals("node1",children.get().get(0));
-        assertEquals("node1",disconnectedClient.getChildren("/root").get(0));
+        assertEquals("node1", children.get().get(0));
+        assertEquals("node1", disconnectedClient.getChildren("/root").get(0));
         //
         disconnectedClient.close();
         gateway.stop();
