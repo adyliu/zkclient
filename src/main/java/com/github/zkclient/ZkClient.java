@@ -751,8 +751,8 @@ public class ZkClient implements Watcher, IZkClient {
 
             LOG.debug("Awaiting connection to Zookeeper server: " + maxMsToWaitUntilConnected);
             if (!waitUntilConnected(maxMsToWaitUntilConnected, TimeUnit.MILLISECONDS)) {
-                throw new ZkTimeoutException(
-                        "Unable to connect to zookeeper server within timeout: " + maxMsToWaitUntilConnected);
+                throw new ZkTimeoutException(String.format(
+                        "Unable to connect to zookeeper server[%s] within timeout %dms", _connection.getServers(), maxMsToWaitUntilConnected));
             }
             started = true;
         } catch (InterruptedException e) {
