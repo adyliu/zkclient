@@ -740,7 +740,10 @@ public class ZkClient implements Watcher, IZkClient {
     }
 
 
-    public void connect(final long maxMsToWaitUntilConnected, Watcher watcher) {
+    public synchronized void connect(final long maxMsToWaitUntilConnected, Watcher watcher) {
+        if (_eventThread != null) {
+            return;
+        }
         boolean started = false;
         try {
             getEventLock().lockInterruptibly();
@@ -794,6 +797,7 @@ public class ZkClient implements Watcher, IZkClient {
             _eventThread.join(2000);
             _connection.close();
             _connection = null;
+            _eventThread = null;
         } catch (InterruptedException e) {
             throw new ZkInterruptedException(e);
         } finally {

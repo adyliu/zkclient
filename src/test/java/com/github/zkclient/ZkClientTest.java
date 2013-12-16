@@ -86,6 +86,7 @@ public class ZkClientTest {
     public void setUp() throws Exception {
         this.server = startZkServer("server_" + counter.incrementAndGet(), 4711);
         this.client = this.server.getZkClient();
+        assertTrue(this.client.isConnected());
     }
 
     @After
