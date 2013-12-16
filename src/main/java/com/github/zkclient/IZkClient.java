@@ -409,6 +409,12 @@ public interface IZkClient extends Closeable {
     ZooKeeper getZooKeeper();
 
     /**
+     * check the connecting state of zookeeper client
+     * @return true if connected
+     */
+    boolean isConnected();
+
+    /**
      * A CAS operation
      */
     interface DataUpdater {

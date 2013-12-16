@@ -64,7 +64,7 @@ public class ZkClient implements Watcher, IZkClient {
 
     private final Set<IZkStateListener> _stateListener = new CopyOnWriteArraySet<IZkStateListener>();
 
-    private KeeperState _currentState;
+    private volatile KeeperState _currentState;
 
     private final ZkLock _zkEventLock = new ZkLock();
 
@@ -848,5 +848,10 @@ public class ZkClient implements Watcher, IZkClient {
     @Override
     public ZooKeeper getZooKeeper() {
         return _connection != null ? _connection.getZooKeeper() : null;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return _currentState == KeeperState.SyncConnected;
     }
 }
