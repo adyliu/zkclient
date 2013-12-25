@@ -68,7 +68,7 @@ public class ZkClient implements Watcher, IZkClient {
 
     private final ZkLock _zkEventLock = new ZkLock();
 
-    private boolean _shutdownTriggered;
+    private volatile boolean _shutdownTriggered;
 
     private ZkEventThread _eventThread;
 
@@ -785,18 +785,18 @@ public class ZkClient implements Watcher, IZkClient {
         }
     }
 
-    public void close() throws ZkInterruptedException {
-        if (_connection == null) {
+    public synchronized void close() throws ZkInterruptedException {
+        if (_eventThread == null) {
             return;
         }
         LOG.debug("Closing ZkClient...");
         getEventLock().lock();
         try {
             setShutdownTrigger(true);
+            _currentState = null;
             _eventThread.interrupt();
             _eventThread.join(2000);
             _connection.close();
-            _connection = null;
             _eventThread = null;
         } catch (InterruptedException e) {
             throw new ZkInterruptedException(e);
@@ -818,11 +818,11 @@ public class ZkClient implements Watcher, IZkClient {
         }
     }
 
-    public void setShutdownTrigger(boolean triggerState) {
+    private void setShutdownTrigger(boolean triggerState) {
         _shutdownTriggered = triggerState;
     }
 
-    public boolean getShutdownTrigger() {
+    private boolean getShutdownTrigger() {
         return _shutdownTriggered;
     }
 
