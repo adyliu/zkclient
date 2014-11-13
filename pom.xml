@@ -127,7 +127,7 @@
                     <source>1.6</source>
                     <encoding>UTF-8</encoding>
                     <links>
-                        <link>http://java.sun.com/javase/6/docs/api/</link>
+                        <link>https://docs.oracle.com/javase/6/docs/api/</link>
                     </links>
                 </configuration>
                 <executions>
