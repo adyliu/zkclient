@@ -237,8 +237,8 @@ public interface IZkClient extends Closeable {
      *
      * @param path the path for the node
      * @return the data for the node
-     * @throws {@link com.github.zkclient.exception.ZkNoNodeException} if the node not exists
-     * @see {@link #readData(String, boolean)}
+     * @throws com.github.zkclient.exception.ZkNoNodeException if the node not exists
+     * @see #readData(String, boolean)
      */
     byte[] readData(String path);
 
@@ -257,7 +257,7 @@ public interface IZkClient extends Closeable {
      * @param path the path for the node
      * @param stat the stat for the node
      * @return the data for the node
-     * @see {@link #readData(String, boolean)}
+     * @see #readData(String, boolean)
      */
     byte[] readData(String path, Stat stat);
 
@@ -267,7 +267,7 @@ public interface IZkClient extends Closeable {
      * @param path     the path for the node
      * @param listener the listener
      * @return the children list or null if the node not exists
-     * @see {@link IZkChildListener}
+     * @see IZkChildListener
      */
     List<String> subscribeChildChanges(String path, IZkChildListener listener);
 
@@ -276,7 +276,7 @@ public interface IZkClient extends Closeable {
      *
      * @param path     the path for the node
      * @param listener the data changing listener
-     * @see {@link IZkDataListener}
+     * @see IZkDataListener
      */
     void subscribeDataChanges(String path, IZkDataListener listener);
 
@@ -284,7 +284,7 @@ public interface IZkClient extends Closeable {
      * subscribe the connection state
      *
      * @param listener the connection listener
-     * @see {@link IZkStateListener}
+     * @see IZkStateListener
      */
     void subscribeStateChanges(IZkStateListener listener);
 
@@ -346,8 +346,8 @@ public interface IZkClient extends Closeable {
      * </pre>
      *
      * @return true if the client connects the server
-     * @throws ZkInterruptedException
-     * @see {@link #waitForKeeperState(org.apache.zookeeper.Watcher.Event.KeeperState, long, java.util.concurrent.TimeUnit)}
+     * @throws ZkInterruptedException the thread was interrupted
+     * @see #waitForKeeperState(org.apache.zookeeper.Watcher.Event.KeeperState, long, java.util.concurrent.TimeUnit)
      */
     boolean waitUntilConnected() throws ZkInterruptedException;
 
@@ -386,7 +386,7 @@ public interface IZkClient extends Closeable {
      * @param data            the data for the node
      * @param expectedVersion the version for the node
      * @return the stat for the node
-     * @see {@link #cas(String, com.github.zkclient.IZkClient.DataUpdater)}
+     * @see #cas(String, com.github.zkclient.IZkClient.DataUpdater)
      */
     Stat writeData(String path, byte[] data, int expectedVersion);
 
@@ -395,9 +395,9 @@ public interface IZkClient extends Closeable {
      *
      * @param ops operations
      * @return op result
-     * @see {@link org.apache.zookeeper.ZooKeeper#multi(Iterable)}
-     * @see {@link org.apache.zookeeper.Op}
-     * @see {@link org.apache.zookeeper.OpResult}
+     * @see org.apache.zookeeper.ZooKeeper#multi(Iterable)
+     * @see org.apache.zookeeper.Op
+     * @see org.apache.zookeeper.OpResult
      */
     List<?> multi(Iterable<?> ops);
 

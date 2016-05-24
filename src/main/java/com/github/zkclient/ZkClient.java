@@ -579,6 +579,7 @@ public class ZkClient implements Watcher, IZkClient {
 
     /**
      * @param callable the callable object
+     * @param <E> the runtime type of result
      * @return result of Callable
      * @throws ZkInterruptedException   if operation was interrupted, or a required reconnection
      *                                  got interrupted

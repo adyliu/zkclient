@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * An {@link IZkChildListener} can be registered at a {@link ZkClient} for listening on zk child changes for a given
  * path.
- * <p/>
+ * <p>
  * Node: Also this listener re-subscribes it watch for the path on each zk event (zk watches are one-timers) is is not
  * guaranteed that events on the path are missing (see http://zookeeper.apache.org/doc/current/zookeeperProgrammers.html#ch_zkWatches). An
  * implementation of this class should take that into account.
@@ -35,7 +35,7 @@ public interface IZkChildListener {
      *
      * @param parentPath      The parent path
      * @param currentChildren The children or null if the root node (parent path) was deleted.
-     * @throws Exception
+     * @throws Exception any exception
      */
     public void handleChildChange(String parentPath, List<String> currentChildren) throws Exception;
 }
