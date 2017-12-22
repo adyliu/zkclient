@@ -438,10 +438,11 @@ public class ZkClient implements Watcher, IZkClient {
         } catch (ZkNoNodeException e) {
             return true;
         }
-
-        for (String subPath : children) {
-            if (!deleteRecursive(path + "/" + subPath)) {
-                return false;
+        if (children != null){
+            for (String subPath : children) {
+                if (!deleteRecursive(path + "/" + subPath)) {
+                    return false;
+                }
             }
         }
 
