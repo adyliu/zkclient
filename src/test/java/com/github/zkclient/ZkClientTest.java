@@ -79,7 +79,7 @@ public class ZkClientTest {
 
     @AfterClass
     public static void cleanup() throws IOException {
-        deleteFile(new File(".", "build/test").getCanonicalFile());
+       deleteFile(new File(".", "build/test").getCanonicalFile());
     }
 
     @Before
